@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Contacts – ShreeNova Tech Admin</title>
+<link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><img src="../../public/logo.png" alt="SNT" onerror="this.style.display='none'" /><span>ShreeNova Tech</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a class="nav-item" data-page="dashboard.html" href="dashboard.html"><span class="icon">📊</span><span>Dashboard</span></a>
+      <div class="nav-section">Management</div>
+      <a class="nav-item" data-page="bookings.html"  href="bookings.html"><span class="icon">📋</span><span>Bookings</span></a>
+      <a class="nav-item" data-page="payments.html"  href="payments.html"><span class="icon">💳</span><span>Payments</span></a>
+      <a class="nav-item" data-page="contacts.html"  href="contacts.html"><span class="icon">✉️</span><span>Contacts</span></a>
+      <div class="nav-section">Website</div>
+      <a class="nav-item" data-page="portfolio.html"    href="portfolio.html"><span class="icon">🖼️</span><span>Portfolio</span></a>
+      <a class="nav-item" data-page="pricing.html"      href="pricing.html"><span class="icon">💰</span><span>Pricing</span></a>
+      <a class="nav-item" data-page="testimonials.html" href="testimonials.html"><span class="icon">⭐</span><span>Testimonials</span></a>
+      <a class="nav-item" data-page="faqs.html"         href="faqs.html"><span class="icon">❓</span><span>FAQs</span></a>
+      <a class="nav-item" data-page="hosting.html"      href="hosting.html"><span class="icon">🌐</span><span>Hosting Plans</span></a>
+      <a class="nav-item" data-page="blog.html"         href="blog.html"><span class="icon">📝</span><span>Blog</span></a>
+      <div class="nav-section">System</div>
+      <a class="nav-item" data-page="media.html"    href="media.html"><span class="icon">🗂️</span><span>Media Manager</span></a>
+      <a class="nav-item" data-page="seo.html"      href="seo.html"><span class="icon">🔍</span><span>SEO Settings</span></a>
+      <a class="nav-item" data-page="users.html"    href="users.html"><span class="icon">👥</span><span>Users</span></a>
+      <a class="nav-item" data-page="settings.html" href="settings.html"><span class="icon">⚙️</span><span>Settings</span></a>
+    </nav>
+    <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-avatar user-initials">A</div><div class="sidebar-user-info"><strong class="user-name">Admin</strong><small class="user-role">super_admin</small></div></div></div>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <div class="topbar">
+      <div class="topbar-left"><button class="toggle-btn" id="sidebarToggle">☰</button><span class="page-title">Contact Messages</span></div>
+      <div class="topbar-right">
+        <button class="topbar-btn" onclick="logout()">🚪</button>
+        <div class="topbar-user"><div class="topbar-avatar user-initials">A</div><span class="topbar-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="filter-bar">
+        <div class="search-box"><span>🔍</span><input type="text" id="searchInput" placeholder="Search by name, email, message..." oninput="debounceLoad()" /></div>
+        <select class="filter-select" id="statusFilter" onchange="loadContacts(1)">
+          <option value="">All Status</option>
+          <option value="new">New</option>
+          <option value="read">Read</option>
+          <option value="replied">Replied</option>
+        </select>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">All Messages</span>
+          <span id="totalCount" style="font-size:13px;color:#64748b"></span>
+        </div>
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Message</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+              <tbody id="contactsBody"><tr><td colspan="7"><div class="empty-state"><div class="icon">⏳</div><p>Loading...</p></div></td></tr></tbody>
+            </table>
+          </div>
+          <div class="pagination" id="pagination"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View/Reply Modal -->
+<div class="modal-backdrop" id="viewModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Message Details</span><button class="modal-close" onclick="closeModal('viewModal')">✕</button></div>
+    <div class="modal-body" id="viewBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="sendReply()">📨 Send Reply</button>
+      <button class="btn btn-outline" onclick="closeModal('viewModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+<script>
+let currentPage = 1, currentId = null, debounceTimer;
+function debounceLoad() { clearTimeout(debounceTimer); debounceTimer = setTimeout(() => loadContacts(1), 400); }
+
+async function loadContacts(page = 1) {
+  currentPage = page;
+  const search = document.getElementById('searchInput').value.trim();
+  const status = document.getElementById('statusFilter').value;
+  const params = new URLSearchParams({ page, limit:20, ...(search&&{search}), ...(status&&{status}) });
+  const data = await apiFetch(`/contact?${params}`);
+  const tbody = document.getElementById('contactsBody');
+  if (!data?.success) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><p>Failed to load</p></div></td></tr>'; return; }
+  const { contacts, pagination } = data.data;
+  document.getElementById('totalCount').textContent = `Total: ${pagination.total}`;
+  tbody.innerHTML = contacts.length
+    ? contacts.map(c => `<tr style="${c.status==='new'?'font-weight:600':''}">
+        <td>${c.name}</td>
+        <td style="font-size:12px">${c.email}</td>
+        <td>${c.phone||'—'}</td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.message}</td>
+        <td>${statusBadge(c.status)}</td>
+        <td>${fmtDate(c.created_at)}</td>
+        <td style="display:flex;gap:6px">
+          <button class="btn-icon" onclick="viewContact(${c.id})" title="View & Reply">👁️</button>
+          <button class="btn-icon" onclick="deleteContact(${c.id})" title="Delete" style="color:#ef4444">🗑️</button>
+        </td>
+      </tr>`).join('')
+    : '<tr><td colspan="7"><div class="empty-state"><div class="icon">✉️</div><p>No messages found</p></div></td></tr>';
+  renderPagination('pagination', pagination, 'loadContacts');
+}
+
+async function viewContact(id) {
+  currentId = id;
+  const data = await apiFetch(`/contact/${id}`);
+  if (!data?.success) return;
+  const c = data.data;
+  document.getElementById('viewBody').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      ${[['Name',c.name],['Email',c.email],['Phone',c.phone||'—'],['Status',c.status],['Date',fmtDateTime(c.created_at)]].map(([k,v])=>`
+        <div style="background:#f8fafc;border-radius:8px;padding:12px">
+          <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:4px">${k}</div>
+          <div style="font-size:13.5px;font-weight:600">${v}</div>
+        </div>`).join('')}
+    </div>
+    <div style="background:#f8fafc;border-radius:8px;padding:14px;margin-bottom:16px">
+      <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:8px">Message</div>
+      <p style="font-size:14px;line-height:1.6">${c.message}</p>
+    </div>
+    ${c.reply_text?`<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px;margin-bottom:16px"><div style="font-size:11px;color:#15803d;font-weight:600;text-transform:uppercase;margin-bottom:8px">Previous Reply</div><p style="font-size:13.5px">${c.reply_text}</p></div>`:''}
+    <div class="form-group">
+      <label class="form-label">Reply Message</label>
+      <textarea class="form-control" id="replyText" rows="4" placeholder="Type your reply here..."></textarea>
+    </div>`;
+  openModal('viewModal');
+  loadContacts(currentPage);
+}
+
+async function sendReply() {
+  const reply = document.getElementById('replyText')?.value.trim();
+  if (!reply) { toast('Please enter a reply message', 'error'); return; }
+  const data = await apiFetch(`/contact/${currentId}/reply`, { method:'PUT', body: JSON.stringify({ reply }) });
+  if (data?.success) { toast('Reply saved! ✅'); closeModal('viewModal'); loadContacts(currentPage); }
+  else toast(data?.message || 'Failed', 'error');
+}
+
+async function deleteContact(id) {
+  if (!confirmDelete('Delete this message?')) return;
+  const data = await apiFetch(`/contact/${id}`, { method:'DELETE' });
+  if (data?.success) { toast('Message deleted'); loadContacts(currentPage); }
+  else toast(data?.message || 'Failed', 'error');
+}
+
+document.addEventListener('DOMContentLoaded', () => loadContacts(1));
+</script>
+</body>
+</html>

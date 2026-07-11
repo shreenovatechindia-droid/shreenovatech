@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Settings – ShreeNova Tech Admin</title>
+<link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><img src="../../public/logo.png" alt="SNT" onerror="this.style.display='none'" /><span>ShreeNova Tech</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a class="nav-item" data-page="dashboard.html" href="dashboard.html"><span class="icon">📊</span><span>Dashboard</span></a>
+      <div class="nav-section">Management</div>
+      <a class="nav-item" data-page="bookings.html"  href="bookings.html"><span class="icon">📋</span><span>Bookings</span></a>
+      <a class="nav-item" data-page="payments.html"  href="payments.html"><span class="icon">💳</span><span>Payments</span></a>
+      <a class="nav-item" data-page="contacts.html"  href="contacts.html"><span class="icon">✉️</span><span>Contacts</span></a>
+      <div class="nav-section">Website</div>
+      <a class="nav-item" data-page="portfolio.html"    href="portfolio.html"><span class="icon">🖼️</span><span>Portfolio</span></a>
+      <a class="nav-item" data-page="pricing.html"      href="pricing.html"><span class="icon">💰</span><span>Pricing</span></a>
+      <a class="nav-item" data-page="testimonials.html" href="testimonials.html"><span class="icon">⭐</span><span>Testimonials</span></a>
+      <a class="nav-item" data-page="faqs.html"         href="faqs.html"><span class="icon">❓</span><span>FAQs</span></a>
+      <a class="nav-item" data-page="hosting.html"      href="hosting.html"><span class="icon">🌐</span><span>Hosting Plans</span></a>
+      <a class="nav-item" data-page="blog.html"         href="blog.html"><span class="icon">📝</span><span>Blog</span></a>
+      <div class="nav-section">System</div>
+      <a class="nav-item" data-page="media.html"    href="media.html"><span class="icon">🗂️</span><span>Media Manager</span></a>
+      <a class="nav-item" data-page="seo.html"      href="seo.html"><span class="icon">🔍</span><span>SEO Settings</span></a>
+      <a class="nav-item" data-page="users.html"    href="users.html"><span class="icon">👥</span><span>Users</span></a>
+      <a class="nav-item" data-page="settings.html" href="settings.html"><span class="icon">⚙️</span><span>Settings</span></a>
+    </nav>
+    <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-avatar user-initials">A</div><div class="sidebar-user-info"><strong class="user-name">Admin</strong><small class="user-role">super_admin</small></div></div></div>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <div class="topbar">
+      <div class="topbar-left"><button class="toggle-btn" id="sidebarToggle">☰</button><span class="page-title">Settings</span></div>
+      <div class="topbar-right">
+        <button class="topbar-btn" onclick="logout()">🚪</button>
+        <div class="topbar-user"><div class="topbar-avatar user-initials">A</div><span class="topbar-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <!-- Tabs -->
+      <div style="display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm tab-btn" data-tab="general" onclick="switchTab('general')">🏢 General</button>
+        <button class="btn btn-outline btn-sm tab-btn" data-tab="payment" onclick="switchTab('payment')">💳 Payment</button>
+        <button class="btn btn-outline btn-sm tab-btn" data-tab="social"  onclick="switchTab('social')">📱 Social</button>
+        <button class="btn btn-outline btn-sm tab-btn" data-tab="smtp"    onclick="switchTab('smtp')">📧 SMTP</button>
+        <button class="btn btn-outline btn-sm tab-btn" data-tab="seo"     onclick="switchTab('seo')">🔍 SEO</button>
+        <button class="btn btn-outline btn-sm tab-btn" data-tab="hero"    onclick="switchTab('hero')">🦸 Hero</button>
+      </div>
+
+      <div class="alert alert-success" id="saveAlert">✓ Settings saved successfully!</div>
+
+      <!-- General -->
+      <div id="tab-general" class="tab-content">
+        <div class="card"><div class="card-header"><span class="card-title">🏢 Company Information</span></div><div class="card-body">
+          <div class="form-row"><div class="form-group"><label class="form-label">Company Name</label><input class="form-control" id="company_name" /></div><div class="form-group"><label class="form-label">Email</label><input class="form-control" id="company_email" type="email" /></div></div>
+          <div class="form-row"><div class="form-group"><label class="form-label">Phone</label><input class="form-control" id="company_phone" /></div><div class="form-group"><label class="form-label">WhatsApp Number</label><input class="form-control" id="company_whatsapp" /></div></div>
+          <div class="form-row full"><div class="form-group"><label class="form-label">Address</label><input class="form-control" id="company_address" /></div></div>
+          <div class="form-row"><div class="form-group"><label class="form-label">Website</label><input class="form-control" id="company_website" /></div><div class="form-group"><label class="form-label">Logo URL</label><input class="form-control" id="logo_url" /></div></div>
+          <div class="form-row full"><div class="form-group"><label class="form-label">Topbar Announcement Text</label><input class="form-control" id="topbar_text" /></div></div>
+          <button class="btn btn-primary" onclick="saveSettings(['company_name','company_email','company_phone','company_whatsapp','company_address','company_website','logo_url','topbar_text'])">💾 Save General Settings</button>
+        </div></div>
+      </div>
+
+      <!-- Payment -->
+      <div id="tab-payment" class="tab-content" style="display:none">
+        <div class="card"><div class="card-header"><span class="card-title">💳 Payment & Bank Details</span></div><div class="card-body">
+          <div class="form-row"><div class="form-group"><label class="form-label">Account Holder</label><input class="form-control" id="bank_holder" /></div><div class="form-group"><label class="form-label">Bank Name</label><input class="form-control" id="bank_name" /></div></div>
+          <div class="form-row"><div class="form-group"><label class="form-label">Account Number</label><input class="form-control" id="bank_account" /></div><div class="form-group"><label class="form-label">IFSC Code</label><input class="form-control" id="bank_ifsc" /></div></div>
+          <div class="form-row"><div class="form-group"><label class="form-label">Branch Name</label><input class="form-control" id="bank_branch" /></div><div class="form-group"><label class="form-label">UPI ID</label><input class="form-control" id="upi_id" /></div></div>
+          <div class="form-row full"><div class="form-group"><label class="form-label">QR Code URL</label><input class="form-control" id="qr_code_url" /></div></div>
+          <button class="btn btn-primary" onclick="saveSettings(['bank_holder','bank_name','bank_account','bank_ifsc','bank_branch','upi_id','qr_code_url'])">💾 Save Payment Settings</button>
+        </div></div>
+      </div>
+
+      <!-- Social -->
+      <div id="tab-social" class="tab-content" style="display:none">
+        <div class="card"><div class="card-header"><span class="card-title">📱 Social Media Links</span></div><div class="card-body">
+          <div class="form-row"><div class="form-group"><label class="form-label">Facebook URL</label><input class="form-control" id="facebook_url" /></div><div class="form-group"><label class="form-label">Instagram URL</label><input class="form-control" id="instagram_url" /></div></div>
+          <div class="form-row"><div class="form-group"><label class="form-label">YouTube URL</label><input class="form-control" id="youtube_url" /></div><div class="form-group"><label class="form-label">LinkedIn URL</label><input class="form-control" id="linkedin_url" /></div></div>
+          <button class="btn btn-primary" onclick="saveSettings(['facebook_url','instagram_url','youtube_url','linkedin_url'])">💾 Save Social Links</button>
+        </div></div>
+      </div>
+
+      <!-- SMTP -->
+      <div id="tab-smtp" class="tab-content" style="display:none">
+        <div class="card"><div class="card-header"><span class="card-title">📧 SMTP Email Settings</span></div><div class="card-body">
+          <div class="form-row"><div class="form-group"><label class="form-label">SMTP Host</label><input class="form-control" id="smtp_host" /></div><div class="form-group"><label class="form-label">SMTP Port</label><input class="form-control" id="smtp_port" /></div></div>
+          <div class="form-row"><div class="form-group"><label class="form-label">SMTP Username</label><input class="form-control" id="smtp_user" /></div><div class="form-group"><label class="form-label">SMTP Password</label><input class="form-control" id="smtp_pass" type="password" /></div></div>
+          <div class="form-row full"><div class="form-group"><label class="form-label">From Name</label><input class="form-control" id="smtp_from_name" /></div></div>
+          <button class="btn btn-primary" onclick="saveSettings(['smtp_host','smtp_port','smtp_user','smtp_pass','smtp_from_name'])">💾 Save SMTP Settings</button>
+        </div></div>
+      </div>
+
+      <!-- SEO -->
+      <div id="tab-seo" class="tab-content" style="display:none">
+        <div class="card"><div class="card-header"><span class="card-title">🔍 Global SEO Settings</span></div><div class="card-body">
+          <div class="form-row full"><div class="form-group"><label class="form-label">Meta Title</label><input class="form-control" id="meta_title" /></div></div>
+          <div class="form-row full"><div class="form-group"><label class="form-label">Meta Description</label><textarea class="form-control" id="meta_description" rows="3"></textarea></div></div>
+          <div class="form-row full"><div class="form-group"><label class="form-label">Meta Keywords</label><input class="form-control" id="meta_keywords" /></div></div>
+          <div class="form-row full"><div class="form-group"><label class="form-label">Google Analytics ID</label><input class="form-control" id="google_analytics" placeholder="G-XXXXXXXXXX" /></div></div>
+          <button class="btn btn-primary" onclick="saveSettings(['meta_title','meta_description','meta_keywords','google_analytics'])">💾 Save SEO Settings</button>
+        </div></div>
+      </div>
+
+      <!-- Hero -->
+      <div id="tab-hero" class="tab-content" style="display:none">
+        <div class="card"><div class="card-header"><span class="card-title">🦸 Hero Section</span></div><div class="card-body">
+          <div class="form-row full"><div class="form-group"><label class="form-label">Hero Title</label><input class="form-control" id="hero_title" /></div></div>
+          <div class="form-row"><div class="form-group"><label class="form-label">Hero Price</label><input class="form-control" id="hero_price" /></div><div class="form-group"><label class="form-label">Slots Text</label><input class="form-control" id="hero_slots" /></div></div>
+          <div class="form-row full"><div class="form-group"><label class="form-label">Offer Text</label><input class="form-control" id="hero_offer_text" /></div></div>
+          <button class="btn btn-primary" onclick="saveSettings(['hero_title','hero_price','hero_slots','hero_offer_text'])">💾 Save Hero Settings</button>
+        </div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+  document.getElementById(`tab-${tab}`).style.display = 'block';
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.className = btn.dataset.tab === tab ? 'btn btn-primary btn-sm tab-btn' : 'btn btn-outline btn-sm tab-btn';
+  });
+}
+
+async function loadSettings() {
+  const data = await apiFetch('/settings');
+  if (!data?.success) return;
+  const s = data.data;
+  Object.keys(s).forEach(key => {
+    const el = document.getElementById(key);
+    if (el) el.value = s[key] || '';
+  });
+}
+
+async function saveSettings(keys) {
+  const payload = {};
+  keys.forEach(k => { const el = document.getElementById(k); if (el) payload[k] = el.value; });
+  const data = await apiFetch('/settings', { method:'PUT', body: JSON.stringify(payload) });
+  if (data?.success) {
+    const alert = document.getElementById('saveAlert');
+    alert.className = 'alert alert-success show';
+    setTimeout(() => alert.className = 'alert alert-success', 3000);
+    toast('Settings saved!');
+  } else toast(data?.message || 'Failed', 'error');
+}
+
+document.addEventListener('DOMContentLoaded', loadSettings);
+</script>
+</body>
+</html>

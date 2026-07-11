@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Payments – ShreeNova Tech Admin</title>
+<link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><img src="../../public/logo.png" alt="SNT" onerror="this.style.display='none'" /><span>ShreeNova Tech</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a class="nav-item" data-page="dashboard.html" href="dashboard.html"><span class="icon">📊</span><span>Dashboard</span></a>
+      <div class="nav-section">Management</div>
+      <a class="nav-item" data-page="bookings.html"  href="bookings.html"><span class="icon">📋</span><span>Bookings</span></a>
+      <a class="nav-item" data-page="payments.html"  href="payments.html"><span class="icon">💳</span><span>Payments</span></a>
+      <a class="nav-item" data-page="contacts.html"  href="contacts.html"><span class="icon">✉️</span><span>Contacts</span></a>
+      <div class="nav-section">Website</div>
+      <a class="nav-item" data-page="portfolio.html"    href="portfolio.html"><span class="icon">🖼️</span><span>Portfolio</span></a>
+      <a class="nav-item" data-page="pricing.html"      href="pricing.html"><span class="icon">💰</span><span>Pricing</span></a>
+      <a class="nav-item" data-page="testimonials.html" href="testimonials.html"><span class="icon">⭐</span><span>Testimonials</span></a>
+      <a class="nav-item" data-page="faqs.html"         href="faqs.html"><span class="icon">❓</span><span>FAQs</span></a>
+      <a class="nav-item" data-page="hosting.html"      href="hosting.html"><span class="icon">🌐</span><span>Hosting Plans</span></a>
+      <a class="nav-item" data-page="blog.html"         href="blog.html"><span class="icon">📝</span><span>Blog</span></a>
+      <div class="nav-section">System</div>
+      <a class="nav-item" data-page="media.html"    href="media.html"><span class="icon">🗂️</span><span>Media Manager</span></a>
+      <a class="nav-item" data-page="seo.html"      href="seo.html"><span class="icon">🔍</span><span>SEO Settings</span></a>
+      <a class="nav-item" data-page="users.html"    href="users.html"><span class="icon">👥</span><span>Users</span></a>
+      <a class="nav-item" data-page="settings.html" href="settings.html"><span class="icon">⚙️</span><span>Settings</span></a>
+    </nav>
+    <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-avatar user-initials">A</div><div class="sidebar-user-info"><strong class="user-name">Admin</strong><small class="user-role">super_admin</small></div></div></div>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <div class="topbar">
+      <div class="topbar-left"><button class="toggle-btn" id="sidebarToggle">☰</button><span class="page-title">Payments</span></div>
+      <div class="topbar-right">
+        <button class="btn btn-outline btn-sm" onclick="exportCSV()">📥 Export CSV</button>
+        <button class="topbar-btn" onclick="logout()">🚪</button>
+        <div class="topbar-user"><div class="topbar-avatar user-initials">A</div><span class="topbar-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="filter-bar">
+        <div class="search-box"><span>🔍</span><input type="text" id="searchInput" placeholder="Search by name, email, ref..." oninput="debounceLoad()" /></div>
+        <select class="filter-select" id="statusFilter" onchange="loadPayments(1)">
+          <option value="">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="verified">Verified</option>
+          <option value="rejected">Rejected</option>
+        </select>
+        <select class="filter-select" id="pkgFilter" onchange="loadPayments(1)">
+          <option value="">All Packages</option>
+          <option value="silver">Silver</option>
+          <option value="golden">Golden</option>
+          <option value="diamond">Diamond</option>
+        </select>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">All Payments</span>
+          <span id="totalCount" style="font-size:13px;color:#64748b"></span>
+        </div>
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Ref ID</th><th>Customer</th><th>Package</th><th>Amount</th><th>Method</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+              <tbody id="paymentsBody"><tr><td colspan="8"><div class="empty-state"><div class="icon">⏳</div><p>Loading...</p></div></td></tr></tbody>
+            </table>
+          </div>
+          <div class="pagination" id="pagination"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View Modal -->
+<div class="modal-backdrop" id="viewModal">
+  <div class="modal modal-lg">
+    <div class="modal-header"><span class="modal-title">Payment Details</span><button class="modal-close" onclick="closeModal('viewModal')">✕</button></div>
+    <div class="modal-body" id="viewBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="approvePayment()">✅ Approve</button>
+      <button class="btn btn-danger"  onclick="rejectPayment()">❌ Reject</button>
+      <button class="btn btn-outline" onclick="printInvoice()">🖨️ Invoice</button>
+      <button class="btn btn-outline" onclick="closeModal('viewModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+<script>
+let currentPage = 1, currentId = null, debounceTimer;
+function debounceLoad() { clearTimeout(debounceTimer); debounceTimer = setTimeout(() => loadPayments(1), 400); }
+
+async function loadPayments(page = 1) {
+  currentPage = page;
+  const search = document.getElementById('searchInput').value.trim();
+  const status = document.getElementById('statusFilter').value;
+  const pkg    = document.getElementById('pkgFilter').value;
+  const params = new URLSearchParams({ page, limit:20, ...(search&&{search}), ...(status&&{status}), ...(pkg&&{package:pkg}) });
+  const data = await apiFetch(`/payments?${params}`);
+  const tbody = document.getElementById('paymentsBody');
+  if (!data?.success) { tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><p>Failed to load</p></div></td></tr>'; return; }
+  const { payments, pagination } = data.data;
+  document.getElementById('totalCount').textContent = `Total: ${pagination.total}`;
+  tbody.innerHTML = payments.length
+    ? payments.map(p => `<tr>
+        <td><code style="font-size:11px;background:#f1f5f9;padding:2px 6px;border-radius:4px">${p.ref_id}</code></td>
+        <td><strong>${p.full_name}</strong><br><small style="color:#64748b">${p.email}</small></td>
+        <td><span class="badge badge-blue">${p.package_key?.toUpperCase()}</span></td>
+        <td><strong>${fmtCurrency(p.total_amount)}</strong></td>
+        <td>${p.pay_method||'—'}</td>
+        <td>${statusBadge(p.status)}</td>
+        <td>${fmtDate(p.created_at)}</td>
+        <td style="display:flex;gap:6px">
+          <button class="btn-icon" onclick="viewPayment(${p.id})" title="View">👁️</button>
+          <button class="btn-icon" onclick="deletePayment(${p.id})" title="Delete" style="color:#ef4444">🗑️</button>
+        </td>
+      </tr>`).join('')
+    : '<tr><td colspan="8"><div class="empty-state"><div class="icon">💳</div><p>No payments found</p></div></td></tr>';
+  renderPagination('pagination', pagination, 'loadPayments');
+}
+
+async function viewPayment(id) {
+  currentId = id;
+  const data = await apiFetch(`/payments/${id}`);
+  if (!data?.success) return;
+  const p = data.data;
+  document.getElementById('viewBody').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      ${[['Ref ID',p.ref_id],['Full Name',p.full_name],['Mobile',p.mobile],['Email',p.email],['Package',p.package_name],['Amount',fmtCurrency(p.amount)],['GST',fmtCurrency(p.gst_amount)],['Total',fmtCurrency(p.total_amount)],['Pay Method',p.pay_method||'—'],['Status',p.status],['City',p.city||'—'],['State',p.state||'—']].map(([k,v])=>`
+        <div style="background:#f8fafc;border-radius:8px;padding:12px">
+          <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:4px">${k}</div>
+          <div style="font-size:13.5px;font-weight:600">${v}</div>
+        </div>`).join('')}
+    </div>
+    ${p.screenshot_url?`<div style="margin-top:16px"><div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:8px">Payment Screenshot</div><img src="${p.screenshot_url}" style="max-width:100%;border-radius:10px;border:1px solid #e2e8f0" /></div>`:''}
+    <div style="margin-top:16px"><div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:6px">Submitted</div><div style="font-size:13px">${fmtDateTime(p.created_at)}</div></div>`;
+  openModal('viewModal');
+}
+
+async function approvePayment() {
+  if (!currentId) return;
+  const data = await apiFetch(`/payments/${currentId}/status`, { method:'PUT', body: JSON.stringify({ status:'verified' }) });
+  if (data?.success) { toast('Payment approved! ✅'); closeModal('viewModal'); loadPayments(currentPage); }
+  else toast(data?.message || 'Failed', 'error');
+}
+
+async function rejectPayment() {
+  if (!currentId) return;
+  const data = await apiFetch(`/payments/${currentId}/status`, { method:'PUT', body: JSON.stringify({ status:'rejected' }) });
+  if (data?.success) { toast('Payment rejected'); closeModal('viewModal'); loadPayments(currentPage); }
+  else toast(data?.message || 'Failed', 'error');
+}
+
+function printInvoice() { window.print(); }
+
+async function deletePayment(id) {
+  if (!confirmDelete('Delete this payment record?')) return;
+  const data = await apiFetch(`/payments/${id}`, { method:'DELETE' });
+  if (data?.success) { toast('Payment deleted'); loadPayments(currentPage); }
+  else toast(data?.message || 'Failed', 'error');
+}
+
+function exportCSV() {
+  const rows = [['Ref ID','Name','Email','Package','Amount','Method','Status','Date']];
+  document.querySelectorAll('#paymentsBody tr').forEach(tr => {
+    const tds = tr.querySelectorAll('td');
+    if (tds.length > 1) rows.push([tds[0].textContent.trim(), tds[1].textContent.trim().split('\n')[0], '', tds[2].textContent.trim(), tds[3].textContent.trim(), tds[4].textContent.trim(), tds[5].textContent.trim(), tds[6].textContent.trim()]);
+  });
+  const csv = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+  const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'payments.csv'; a.click();
+}
+
+document.addEventListener('DOMContentLoaded', () => loadPayments(1));
+</script>
+</body>
+</html>

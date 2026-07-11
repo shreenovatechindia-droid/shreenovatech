@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Pricing – ShreeNova Tech Admin</title>
+<link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><img src="../../public/logo.png" alt="SNT" onerror="this.style.display='none'" /><span>ShreeNova Tech</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a class="nav-item" data-page="dashboard.html" href="dashboard.html"><span class="icon">📊</span><span>Dashboard</span></a>
+      <div class="nav-section">Management</div>
+      <a class="nav-item" data-page="bookings.html"  href="bookings.html"><span class="icon">📋</span><span>Bookings</span></a>
+      <a class="nav-item" data-page="payments.html"  href="payments.html"><span class="icon">💳</span><span>Payments</span></a>
+      <a class="nav-item" data-page="contacts.html"  href="contacts.html"><span class="icon">✉️</span><span>Contacts</span></a>
+      <div class="nav-section">Website</div>
+      <a class="nav-item" data-page="portfolio.html"    href="portfolio.html"><span class="icon">🖼️</span><span>Portfolio</span></a>
+      <a class="nav-item" data-page="pricing.html"      href="pricing.html"><span class="icon">💰</span><span>Pricing</span></a>
+      <a class="nav-item" data-page="testimonials.html" href="testimonials.html"><span class="icon">⭐</span><span>Testimonials</span></a>
+      <a class="nav-item" data-page="faqs.html"         href="faqs.html"><span class="icon">❓</span><span>FAQs</span></a>
+      <a class="nav-item" data-page="hosting.html"      href="hosting.html"><span class="icon">🌐</span><span>Hosting Plans</span></a>
+      <a class="nav-item" data-page="blog.html"         href="blog.html"><span class="icon">📝</span><span>Blog</span></a>
+      <div class="nav-section">System</div>
+      <a class="nav-item" data-page="media.html"    href="media.html"><span class="icon">🗂️</span><span>Media Manager</span></a>
+      <a class="nav-item" data-page="seo.html"      href="seo.html"><span class="icon">🔍</span><span>SEO Settings</span></a>
+      <a class="nav-item" data-page="users.html"    href="users.html"><span class="icon">👥</span><span>Users</span></a>
+      <a class="nav-item" data-page="settings.html" href="settings.html"><span class="icon">⚙️</span><span>Settings</span></a>
+    </nav>
+    <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-avatar user-initials">A</div><div class="sidebar-user-info"><strong class="user-name">Admin</strong><small class="user-role">super_admin</small></div></div></div>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <div class="topbar">
+      <div class="topbar-left"><button class="toggle-btn" id="sidebarToggle">☰</button><span class="page-title">Pricing Plans</span></div>
+      <div class="topbar-right">
+        <button class="topbar-btn" onclick="logout()">🚪</button>
+        <div class="topbar-user"><div class="topbar-avatar user-initials">A</div><span class="topbar-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div id="pricingCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:24px">
+        <div style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8">Loading...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-backdrop" id="editModal">
+  <div class="modal modal-lg">
+    <div class="modal-header"><span class="modal-title" id="editTitle">Edit Plan</span><button class="modal-close" onclick="closeModal('editModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Plan Name</label><input class="form-control" id="eName" /></div>
+        <div class="form-group"><label class="form-label">Price (display)</label><input class="form-control" id="ePrice" placeholder="₹9,999" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Price (number)</label><input class="form-control" id="ePriceNum" type="number" /></div>
+        <div class="form-group"><label class="form-label">Renewal Text</label><input class="form-control" id="eRenewal" /></div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group"><label class="form-label">Description</label><input class="form-control" id="eDesc" /></div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group"><label class="form-label">Features (one per line)</label><textarea class="form-control" id="eFeatures" rows="8"></textarea></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="flex-direction:row;align-items:center;gap:12px;padding-top:8px">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" id="eFeatured" /> Most Popular</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" id="eActive" checked /> Active</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="savePlan()">💾 Save Changes</button>
+      <button class="btn btn-outline" onclick="closeModal('editModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+<script>
+let editId = null;
+
+async function loadPricing() {
+  const data = await apiFetch('/pricing');
+  const container = document.getElementById('pricingCards');
+  if (!data?.success) { container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#ef4444">Failed to load</div>'; return; }
+  const plans = data.data;
+  const colors = { SILVER:'#94a3b8', GOLDEN:'#f59e0b', DIAMOND:'#6366f1' };
+  container.innerHTML = plans.map(p => `
+    <div class="card">
+      <div style="background:${colors[p.badge]||'#22c55e'};padding:20px;color:#fff;border-radius:14px 14px 0 0">
+        <div style="font-size:12px;font-weight:700;opacity:.8;text-transform:uppercase;margin-bottom:4px">✦ ${p.badge}</div>
+        <div style="font-size:22px;font-weight:800">${p.name}</div>
+        <div style="font-size:32px;font-weight:900;margin-top:8px">${p.price}</div>
+        <div style="font-size:12px;opacity:.8;margin-top:4px">${p.renewal||''}</div>
+        ${p.is_featured?'<div style="margin-top:8px;background:rgba(255,255,255,.2);display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700">⭐ MOST POPULAR</div>':''}
+      </div>
+      <div class="card-body">
+        <p style="font-size:13px;color:#64748b;margin-bottom:12px">${p.description||''}</p>
+        <ul style="list-style:none;padding:0;margin-bottom:16px">
+          ${(p.features||[]).map(f=>`<li style="font-size:13px;padding:4px 0;display:flex;align-items:center;gap:8px"><span style="color:#22c55e;font-weight:700">✓</span>${f}</li>`).join('')}
+        </ul>
+        <button class="btn btn-primary" style="width:100%" onclick="editPlan(${p.id})">✏️ Edit Plan</button>
+      </div>
+    </div>`).join('');
+}
+
+async function editPlan(id) {
+  const data = await apiFetch('/pricing');
+  if (!data?.success) return;
+  const plan = data.data.find(p => p.id === id);
+  if (!plan) return;
+  editId = id;
+  document.getElementById('editTitle').textContent = `Edit ${plan.name}`;
+  document.getElementById('eName').value     = plan.name || '';
+  document.getElementById('ePrice').value    = plan.price || '';
+  document.getElementById('ePriceNum').value = plan.price_num || '';
+  document.getElementById('eRenewal').value  = plan.renewal || '';
+  document.getElementById('eDesc').value     = plan.description || '';
+  document.getElementById('eFeatures').value = (plan.features||[]).join('\n');
+  document.getElementById('eFeatured').checked = !!plan.is_featured;
+  document.getElementById('eActive').checked   = !!plan.is_active;
+  openModal('editModal');
+}
+
+async function savePlan() {
+  const payload = {
+    name:       document.getElementById('eName').value.trim(),
+    price:      document.getElementById('ePrice').value.trim(),
+    price_num:  parseInt(document.getElementById('ePriceNum').value)||0,
+    renewal:    document.getElementById('eRenewal').value.trim(),
+    description:document.getElementById('eDesc').value.trim(),
+    features:   document.getElementById('eFeatures').value.split('\n').map(s=>s.trim()).filter(Boolean),
+    is_featured:document.getElementById('eFeatured').checked ? 1 : 0,
+    is_active:  document.getElementById('eActive').checked ? 1 : 0,
+  };
+  const data = await apiFetch(`/pricing/${editId}`, { method:'PUT', body: JSON.stringify(payload) });
+  if (data?.success) { toast('Plan updated! Changes are live on the website.'); closeModal('editModal'); loadPricing(); }
+  else toast(data?.message || 'Failed', 'error');
+}
+
+document.addEventListener('DOMContentLoaded', loadPricing);
+</script>
+</body>
+</html>

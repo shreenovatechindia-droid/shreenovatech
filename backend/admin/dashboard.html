@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Dashboard – ShreeNova Tech Admin</title>
+<link rel="stylesheet" href="admin.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="admin-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="../../public/logo.png" alt="SNT" onerror="this.style.display='none'" />
+      <span>ShreeNova Tech</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a class="nav-item" data-page="dashboard.html" href="dashboard.html"><span class="icon">📊</span><span>Dashboard</span></a>
+
+      <div class="nav-section">Management</div>
+      <a class="nav-item" data-page="bookings.html"  href="bookings.html"><span class="icon">📋</span><span>Bookings</span></a>
+      <a class="nav-item" data-page="payments.html"  href="payments.html"><span class="icon">💳</span><span>Payments</span></a>
+      <a class="nav-item" data-page="contacts.html"  href="contacts.html"><span class="icon">✉️</span><span>Contacts</span></a>
+
+      <div class="nav-section">Website</div>
+      <a class="nav-item" data-page="portfolio.html"    href="portfolio.html"><span class="icon">🖼️</span><span>Portfolio</span></a>
+      <a class="nav-item" data-page="pricing.html"      href="pricing.html"><span class="icon">💰</span><span>Pricing</span></a>
+      <a class="nav-item" data-page="testimonials.html" href="testimonials.html"><span class="icon">⭐</span><span>Testimonials</span></a>
+      <a class="nav-item" data-page="faqs.html"         href="faqs.html"><span class="icon">❓</span><span>FAQs</span></a>
+      <a class="nav-item" data-page="hosting.html"      href="hosting.html"><span class="icon">🌐</span><span>Hosting Plans</span></a>
+      <a class="nav-item" data-page="blog.html"         href="blog.html"><span class="icon">📝</span><span>Blog</span></a>
+
+      <div class="nav-section">System</div>
+      <a class="nav-item" data-page="media.html"    href="media.html"><span class="icon">🗂️</span><span>Media Manager</span></a>
+      <a class="nav-item" data-page="seo.html"      href="seo.html"><span class="icon">🔍</span><span>SEO Settings</span></a>
+      <a class="nav-item" data-page="users.html"    href="users.html"><span class="icon">👥</span><span>Users</span></a>
+      <a class="nav-item" data-page="settings.html" href="settings.html"><span class="icon">⚙️</span><span>Settings</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar user-initials">A</div>
+        <div class="sidebar-user-info">
+          <strong class="user-name">Admin</strong>
+          <small class="user-role">super_admin</small>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-content" id="mainContent">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="toggle-btn" id="sidebarToggle">☰</button>
+        <span class="page-title">Dashboard</span>
+      </div>
+      <div class="topbar-right">
+        <a href="../../index.html" target="_blank" class="btn btn-outline btn-sm">🌐 View Site</a>
+        <button class="topbar-btn" onclick="logout()" title="Logout">🚪</button>
+        <div class="topbar-user">
+          <div class="topbar-avatar user-initials">A</div>
+          <span class="topbar-name user-name">Admin</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-body">
+
+      <!-- Stats Row 1 -->
+      <div class="stats-row" id="statsRow"></div>
+
+      <!-- Charts Row -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px" id="chartsRow">
+        <div class="card">
+          <div class="card-header"><span class="card-title">📈 Monthly Bookings</span></div>
+          <div class="card-body"><div class="chart-wrap"><canvas id="bookingsChart"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">💰 Monthly Revenue</span></div>
+          <div class="card-body"><div class="chart-wrap"><canvas id="revenueChart"></canvas></div></div>
+        </div>
+      </div>
+
+      <!-- Tables Row -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📋 Recent Bookings</span>
+            <a href="bookings.html" class="btn btn-outline btn-sm">View All</a>
+          </div>
+          <div class="card-body" style="padding:0">
+            <div class="table-wrap"><table id="recentBookings">
+              <thead><tr><th>Name</th><th>Project</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody><tr><td colspan="4" class="empty-state"><p>Loading...</p></td></tr></tbody>
+            </table></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">✉️ Recent Contacts</span>
+            <a href="contacts.html" class="btn btn-outline btn-sm">View All</a>
+          </div>
+          <div class="card-body" style="padding:0">
+            <div class="table-wrap"><table id="recentContacts">
+              <thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody><tr><td colspan="4" class="empty-state"><p>Loading...</p></td></tr></tbody>
+            </table></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Payments + Activity -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">💳 Recent Payments</span>
+            <a href="payments.html" class="btn btn-outline btn-sm">View All</a>
+          </div>
+          <div class="card-body" style="padding:0">
+            <div class="table-wrap"><table id="recentPayments">
+              <thead><tr><th>Name</th><th>Package</th><th>Amount</th><th>Status</th></tr></thead>
+              <tbody><tr><td colspan="4" class="empty-state"><p>Loading...</p></td></tr></tbody>
+            </table></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🕐 Recent Activity</span></div>
+          <div class="card-body" style="padding:0">
+            <div id="activityList" style="max-height:300px;overflow-y:auto"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+<script>
+let bookingsChart, revenueChart;
+
+async function loadDashboard() {
+  const data = await apiFetch('/dashboard');
+  if (!data?.success) return;
+  const d = data.data;
+  const c = d.counts;
+
+  // Stats cards
+  const statsConfig = [
+    { label:'Total Visitors',    val:c.total_visitors,   icon:'👁️',  cls:'blue'   },
+    { label:"Today's Visitors",  val:c.today_visitors,   icon:'📍',  cls:'teal'   },
+    { label:'Total Bookings',    val:c.total_bookings,   icon:'📋',  cls:'green'  },
+    { label:'Pending Bookings',  val:c.pending_bookings, icon:'⏳',  cls:'yellow' },
+    { label:'Completed Projects',val:c.completed,        icon:'✅',  cls:'green'  },
+    { label:'Contact Messages',  val:c.total_contacts,   icon:'✉️',  cls:'purple' },
+    { label:'Total Payments',    val:c.total_payments,   icon:'💳',  cls:'orange' },
+    { label:'Total Revenue',     val:fmtCurrency(c.total_revenue), icon:'💰', cls:'green' },
+  ];
+  document.getElementById('statsRow').innerHTML = statsConfig.map(s => `
+    <div class="stat-card">
+      <div class="stat-icon ${s.cls}">${s.icon}</div>
+      <div><div class="stat-num">${s.val}</div><div class="stat-lbl">${s.label}</div></div>
+    </div>`).join('');
+
+  // Charts
+  const months   = d.monthly_bookings.map(r => r.month);
+  const bookings = d.monthly_bookings.map(r => r.bookings);
+  const completed= d.monthly_bookings.map(r => r.completed);
+  const revMonths = d.monthly_revenue.map(r => r.month);
+  const revAmts   = d.monthly_revenue.map(r => parseFloat(r.amount));
+
+  if (bookingsChart) bookingsChart.destroy();
+  bookingsChart = new Chart(document.getElementById('bookingsChart'), {
+    type:'bar',
+    data:{ labels:months, datasets:[
+      { label:'Bookings', data:bookings, backgroundColor:'rgba(34,197,94,.7)', borderRadius:6 },
+      { label:'Completed', data:completed, backgroundColor:'rgba(59,130,246,.7)', borderRadius:6 },
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } }, scales:{ y:{ beginAtZero:true } } }
+  });
+
+  if (revenueChart) revenueChart.destroy();
+  revenueChart = new Chart(document.getElementById('revenueChart'), {
+    type:'line',
+    data:{ labels:revMonths, datasets:[{
+      label:'Revenue (₹)', data:revAmts,
+      borderColor:'#22c55e', backgroundColor:'rgba(34,197,94,.1)',
+      fill:true, tension:.4, pointBackgroundColor:'#22c55e'
+    }]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } }, scales:{ y:{ beginAtZero:true } } }
+  });
+
+  // Recent Bookings
+  const bTbody = document.querySelector('#recentBookings tbody');
+  bTbody.innerHTML = d.recent_bookings.length
+    ? d.recent_bookings.map(b => `<tr>
+        <td><strong>${b.full_name}</strong><br><small style="color:#64748b">${b.email}</small></td>
+        <td>${b.project_type||'—'}</td>
+        <td>${statusBadge(b.status)}</td>
+        <td>${fmtDate(b.created_at)}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="4"><div class="empty-state"><p>No bookings yet</p></div></td></tr>';
+
+  // Recent Contacts
+  const cTbody = document.querySelector('#recentContacts tbody');
+  cTbody.innerHTML = d.recent_contacts.length
+    ? d.recent_contacts.map(c => `<tr>
+        <td><strong>${c.name}</strong></td>
+        <td style="font-size:12px">${c.email}</td>
+        <td>${statusBadge(c.status)}</td>
+        <td>${fmtDate(c.created_at)}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="4"><div class="empty-state"><p>No messages yet</p></div></td></tr>';
+
+  // Recent Payments
+  const pTbody = document.querySelector('#recentPayments tbody');
+  pTbody.innerHTML = d.recent_payments.length
+    ? d.recent_payments.map(p => `<tr>
+        <td><strong>${p.full_name}</strong></td>
+        <td>${p.package_name||'—'}</td>
+        <td>${fmtCurrency(p.total_amount)}</td>
+        <td>${statusBadge(p.status)}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="4"><div class="empty-state"><p>No payments yet</p></div></td></tr>';
+
+  // Activity
+  const actEl = document.getElementById('activityList');
+  actEl.innerHTML = d.activity.length
+    ? d.activity.map(a => `
+        <div style="padding:12px 20px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:12px">
+          <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0"></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:600">${a.admin_name||'System'} <span style="font-weight:400;color:#64748b">${a.action}</span> in ${a.module}</div>
+            <div style="font-size:11px;color:#94a3b8">${fmtDateTime(a.created_at)}</div>
+          </div>
+        </div>`).join('')
+    : '<div class="empty-state"><p>No activity yet</p></div>';
+}
+
+document.addEventListener('DOMContentLoaded', loadDashboard);
+</script>
+</body>
+</html>

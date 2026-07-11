@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Login – ShreeNova Tech</title>
+<link rel="icon" href="../../public/favicon.svg" />
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f172a 100%);min-height:100vh;display:flex;align-items:center;justify-content:center}
+.login-wrap{width:100%;max-width:440px;padding:24px}
+.login-card{background:#fff;border-radius:20px;padding:40px;box-shadow:0 25px 60px rgba(0,0,0,.35)}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-logo img{height:48px;object-fit:contain}
+.login-logo h1{font-size:22px;font-weight:700;color:#0f172a;margin-top:10px}
+.login-logo p{font-size:13px;color:#64748b;margin-top:4px}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px}
+.form-group input{width:100%;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;color:#0f172a;outline:none;transition:.2s}
+.form-group input:focus{border-color:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.12)}
+.form-group input.err{border-color:#ef4444}
+.err-msg{color:#ef4444;font-size:11.5px;margin-top:4px}
+.row-flex{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.row-flex label{display:flex;align-items:center;gap:6px;font-size:13px;color:#374151;cursor:pointer}
+.row-flex a{font-size:13px;color:#22c55e;text-decoration:none;font-weight:600}
+.btn-login{width:100%;padding:13px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:.2s;letter-spacing:.3px}
+.btn-login:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(34,197,94,.4)}
+.btn-login:disabled{opacity:.7;cursor:not-allowed;transform:none}
+.alert{padding:12px 16px;border-radius:10px;font-size:13px;font-weight:600;margin-bottom:16px;display:none}
+.alert.show{display:block}
+.alert-err{background:#fef2f2;border:1px solid #fecaca;color:#dc2626}
+.alert-ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d}
+.divider{text-align:center;color:#94a3b8;font-size:12px;margin:20px 0;position:relative}
+.divider::before,.divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:#e2e8f0}
+.divider::before{left:0}.divider::after{right:0}
+.forgot-form{display:none}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#22c55e;cursor:pointer;font-weight:600;margin-bottom:20px;background:none;border:none}
+.badge-role{display:inline-block;background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;border-radius:6px;font-size:11px;padding:2px 8px;font-weight:600;margin-left:6px}
+</style>
+</head>
+<body>
+<div class="login-wrap">
+  <div class="login-card">
+
+    <!-- LOGIN FORM -->
+    <div id="loginSection">
+      <div class="login-logo">
+        <img src="../../public/logo.png" alt="ShreeNova Tech" onerror="this.style.display='none'" />
+        <h1>ShreeNova Tech</h1>
+        <p>Admin Panel <span class="badge-role">Secure Login</span></p>
+      </div>
+
+      <div class="alert alert-err" id="loginErr"></div>
+      <div class="alert alert-ok"  id="loginOk"></div>
+
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="loginEmail" placeholder="admin@shreenovatech.in" />
+        <div class="err-msg" id="emailErr"></div>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="Enter your password" />
+        <div class="err-msg" id="passErr"></div>
+      </div>
+      <div class="row-flex">
+        <label><input type="checkbox" id="rememberMe" /> Remember Me</label>
+        <a href="#" onclick="showForgot()">Forgot Password?</a>
+      </div>
+      <button class="btn-login" id="loginBtn" onclick="doLogin()">Sign In to Admin Panel</button>
+      <div class="divider">Default: admin@shreenovatech.in / password</div>
+    </div>
+
+    <!-- FORGOT PASSWORD FORM -->
+    <div id="forgotSection" class="forgot-form">
+      <button class="back-link" onclick="showLogin()">← Back to Login</button>
+      <div class="login-logo">
+        <h1>Forgot Password</h1>
+        <p>Enter your email to receive a reset link</p>
+      </div>
+      <div class="alert alert-err" id="forgotErr"></div>
+      <div class="alert alert-ok"  id="forgotOk"></div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="forgotEmail" placeholder="admin@shreenovatech.in" />
+      </div>
+      <button class="btn-login" onclick="doForgot()">Send Reset Link</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost/shreenovatech/backend/api';
+
+function showForgot() {
+  document.getElementById('loginSection').style.display = 'none';
+  document.getElementById('forgotSection').style.display = 'block';
+}
+function showLogin() {
+  document.getElementById('forgotSection').style.display = 'none';
+  document.getElementById('loginSection').style.display = 'block';
+}
+
+function showAlert(id, msg, type='err') {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = `alert alert-${type} show`;
+}
+function hideAlerts(...ids) { ids.forEach(id => { const el=document.getElementById(id); if(el) el.className='alert'; }); }
+
+async function doLogin() {
+  hideAlerts('loginErr','loginOk');
+  const email    = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPass').value;
+  const remember = document.getElementById('rememberMe').checked;
+
+  if (!email) { document.getElementById('emailErr').textContent='Email is required.'; return; }
+  if (!password) { document.getElementById('passErr').textContent='Password is required.'; return; }
+  document.getElementById('emailErr').textContent='';
+  document.getElementById('passErr').textContent='';
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = 'Signing in...';
+
+  try {
+    const res = await fetch(`${API}/auth/login`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email, password, remember })
+    });
+    const data = await res.json();
+    if (data.success) {
+      localStorage.setItem('snt_token', data.data.token);
+      localStorage.setItem('snt_user',  JSON.stringify(data.data.user));
+      showAlert('loginOk', '✓ Login successful! Redirecting...', 'ok');
+      setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+    } else {
+      showAlert('loginErr', data.message || 'Invalid credentials.');
+    }
+  } catch {
+    showAlert('loginErr', 'Cannot connect to server. Make sure XAMPP is running.');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Sign In to Admin Panel';
+  }
+}
+
+async function doForgot() {
+  hideAlerts('forgotErr','forgotOk');
+  const email = document.getElementById('forgotEmail').value.trim();
+  if (!email) { showAlert('forgotErr','Email is required.'); return; }
+  try {
+    const res  = await fetch(`${API}/auth/forgot`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email }) });
+    const data = await res.json();
+    showAlert('forgotOk', data.message || 'Reset link sent if email exists.', 'ok');
+  } catch {
+    showAlert('forgotErr','Server error. Please try again.');
+  }
+}
+
+// Auto-redirect if already logged in
+if (localStorage.getItem('snt_token')) window.location.href = 'dashboard.html';
+
+// Enter key support
+document.addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
+</script>
+</body>
+</html>
