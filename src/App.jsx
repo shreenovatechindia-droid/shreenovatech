@@ -1,5 +1,6 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
+import { trackPageView } from './analytics.js';
 
 // Redirect /admin to the React admin panel
 function AdminRedirect() {
@@ -32,9 +33,19 @@ import './css/sections.css';
 import './css/responsive.css';
 import './css/service-pages.css';
 
+// Route change pe page view track karo
+function GATracker() {
+  const location = useLocation();
+  useEffect(() => {
+    trackPageView(location.pathname + location.search, document.title);
+  }, [location]);
+  return null;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
+      <GATracker />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/payment" element={<PaymentPage />} />
