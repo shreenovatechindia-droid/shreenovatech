@@ -32,7 +32,7 @@ html { scroll-behavior: smooth; }
 section { padding: 100px 0; }
 
 /* Prevent any element from causing horizontal scroll */
-.container, section, header, footer, nav { max-width: 100%; }
+section, header, footer, nav { max-width: 100%; }
 
 .section-gap { margin-bottom: 80px; }
 
