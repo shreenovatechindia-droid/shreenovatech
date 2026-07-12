@@ -1,0 +1,19 @@
+Options -Indexes
+RewriteEngine On
+
+# ── Backend API ──────────────────────────────────────────────
+# /api/* → backend/api/index.php
+RewriteRule ^api/(.*)$ backend/api/index.php [QSA,L]
+
+# ── React Admin Panel ────────────────────────────────────────
+# /admin/* → backend/admin-react/ (React build)
+RewriteRule ^admin/?$ backend/admin-react/index.html [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^admin/(.*)$ backend/admin-react/$1 [L]
+
+# ── React SPA (Main Frontend) ────────────────────────────────
+# Serve dist/index.html for all other routes (after build)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/backend/
+RewriteRule ^(.*)$ dist/index.html [L]

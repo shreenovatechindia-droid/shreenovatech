@@ -1,4 +1,6 @@
-const API = 'http://localhost/shreenovatech/backend/api';
+const API = window.location.hostname === 'localhost'
+  ? 'http://localhost/shreenovatech/backend/api'
+  : window.location.origin + '/api';
 
 // ── Auth ──────────────────────────────────────────────────────
 function getToken() { return localStorage.getItem('snt_token'); }

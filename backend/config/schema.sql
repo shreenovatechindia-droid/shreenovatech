@@ -462,3 +462,20 @@ CREATE TABLE IF NOT EXISTS visitors (
   INDEX idx_date (visit_date),
   INDEX idx_ip (ip_address)
 ) ENGINE=InnoDB;
+
+-- ============================================================
+-- 19. NOTIFICATIONS
+-- ============================================================
+CREATE TABLE IF NOT EXISTS notifications (
+  id          INT AUTO_INCREMENT PRIMARY KEY,
+  type        VARCHAR(50) DEFAULT 'booking',
+  title       VARCHAR(200) NOT NULL,
+  message     TEXT,
+  ref_id      VARCHAR(25),
+  record_id   INT DEFAULT NULL,
+  is_read     TINYINT(1) DEFAULT 0,
+  created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_read (is_read),
+  INDEX idx_type (type),
+  INDEX idx_created (created_at)
+) ENGINE=InnoDB;

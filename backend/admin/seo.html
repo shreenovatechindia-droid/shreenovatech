@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>SEO Settings – ShreeNova Tech Admin</title>
+<link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><img src="../../public/logo.png" alt="SNT" onerror="this.style.display='none'" /><span>ShreeNova Tech</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a class="nav-item" data-page="dashboard.html" href="dashboard.html"><span class="icon">📊</span><span>Dashboard</span></a>
+      <div class="nav-section">Management</div>
+      <a class="nav-item" data-page="bookings.html"  href="bookings.html"><span class="icon">📋</span><span>Bookings</span></a>
+      <a class="nav-item" data-page="payments.html"  href="payments.html"><span class="icon">💳</span><span>Payments</span></a>
+      <a class="nav-item" data-page="contacts.html"  href="contacts.html"><span class="icon">✉️</span><span>Contacts</span></a>
+      <div class="nav-section">Website</div>
+      <a class="nav-item" data-page="portfolio.html"    href="portfolio.html"><span class="icon">🖼️</span><span>Portfolio</span></a>
+      <a class="nav-item" data-page="pricing.html"      href="pricing.html"><span class="icon">💰</span><span>Pricing</span></a>
+      <a class="nav-item" data-page="testimonials.html" href="testimonials.html"><span class="icon">⭐</span><span>Testimonials</span></a>
+      <a class="nav-item" data-page="faqs.html"         href="faqs.html"><span class="icon">❓</span><span>FAQs</span></a>
+      <a class="nav-item" data-page="hosting.html"      href="hosting.html"><span class="icon">🌐</span><span>Hosting Plans</span></a>
+      <a class="nav-item" data-page="blog.html"         href="blog.html"><span class="icon">📝</span><span>Blog</span></a>
+      <div class="nav-section">System</div>
+      <a class="nav-item" data-page="media.html"    href="media.html"><span class="icon">🗂️</span><span>Media Manager</span></a>
+      <a class="nav-item" data-page="seo.html"      href="seo.html"><span class="icon">🔍</span><span>SEO Settings</span></a>
+      <a class="nav-item" data-page="users.html"    href="users.html"><span class="icon">👥</span><span>Users</span></a>
+      <a class="nav-item" data-page="settings.html" href="settings.html"><span class="icon">⚙️</span><span>Settings</span></a>
+    </nav>
+    <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-avatar user-initials">A</div><div class="sidebar-user-info"><strong class="user-name">Admin</strong><small class="user-role">super_admin</small></div></div></div>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <div class="topbar">
+      <div class="topbar-left"><button class="toggle-btn" id="sidebarToggle">☰</button><span class="page-title">SEO Settings</span></div>
+      <div class="topbar-right">
+        <button class="topbar-btn" onclick="logout()">🚪</button>
+        <div class="topbar-user"><div class="topbar-avatar user-initials">A</div><span class="topbar-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Page SEO Settings</span><small style="color:#64748b">Click a page to edit its SEO</small></div>
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Page</th><th>Slug</th><th>Meta Title</th><th>Robots</th><th>Actions</th></tr></thead>
+              <tbody id="seoBody"><tr><td colspan="5"><div class="empty-state"><div class="icon">⏳</div><p>Loading...</p></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-backdrop" id="editModal">
+  <div class="modal modal-lg">
+    <div class="modal-header"><span class="modal-title" id="modalTitle">Edit SEO</span><button class="modal-close" onclick="closeModal('editModal')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="editSlug" />
+      <div class="form-row full">
+        <div class="form-group"><label class="form-label">Meta Title</label><input class="form-control" id="f_meta_title" maxlength="200" /><small style="color:#94a3b8">Recommended: 50-60 characters</small></div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group"><label class="form-label">Meta Description</label><textarea class="form-control" id="f_meta_desc" rows="3" maxlength="300"></textarea><small style="color:#94a3b8">Recommended: 150-160 characters</small></div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group"><label class="form-label">Meta Keywords</label><input class="form-control" id="f_meta_keywords" placeholder="keyword1, keyword2, keyword3" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">OG Title</label><input class="form-control" id="f_og_title" /></div>
+        <div class="form-group"><label class="form-label">OG Image URL</label><input class="form-control" id="f_og_image" /></div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group"><label class="form-label">OG Description</label><textarea class="form-control" id="f_og_desc" rows="2"></textarea></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Robots</label>
+          <select class="form-control" id="f_robots">
+            <option value="index,follow">index,follow</option>
+            <option value="noindex,follow">noindex,follow</option>
+            <option value="index,nofollow">index,nofollow</option>
+            <option value="noindex,nofollow">noindex,nofollow</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="saveSeo()">💾 Save SEO</button>
+      <button class="btn btn-outline" onclick="closeModal('editModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+<script>
+let allPages = [];
+
+async function loadSeo() {
+  const data = await apiFetch('/seo');
+  if (!data?.success) return;
+  allPages = data.data;
+  const tbody = document.getElementById('seoBody');
+  tbody.innerHTML = allPages.length
+    ? allPages.map(p => `<tr>
+        <td><strong>${p.page_name||p.page_slug}</strong></td>
+        <td><code style="font-size:11px;background:#f1f5f9;padding:2px 6px;border-radius:4px">/${p.page_slug}</code></td>
+        <td style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.meta_title||'—'}</td>
+        <td><span class="badge badge-blue">${p.robots||'index,follow'}</span></td>
+        <td><button class="btn-icon" onclick="editSeo('${p.page_slug}')" title="Edit">✏️</button></td>
+      </tr>`).join('')
+    : '<tr><td colspan="5"><div class="empty-state"><div class="icon">🔍</div><p>No SEO pages found</p></div></td></tr>';
+}
+
+function editSeo(slug) {
+  const p = allPages.find(x => x.page_slug === slug);
+  if (!p) return;
+  document.getElementById('modalTitle').textContent = `SEO: ${p.page_name||slug}`;
+  document.getElementById('editSlug').value = slug;
+  document.getElementById('f_meta_title').value = p.meta_title || '';
+  document.getElementById('f_meta_desc').value = p.meta_desc || '';
+  document.getElementById('f_meta_keywords').value = p.meta_keywords || '';
+  document.getElementById('f_og_title').value = p.og_title || '';
+  document.getElementById('f_og_desc').value = p.og_desc || '';
+  document.getElementById('f_og_image').value = p.og_image || '';
+  document.getElementById('f_robots').value = p.robots || 'index,follow';
+  openModal('editModal');
+}
+
+async function saveSeo() {
+  const slug = document.getElementById('editSlug').value;
+  const payload = {
+    meta_title:    document.getElementById('f_meta_title').value.trim(),
+    meta_desc:     document.getElementById('f_meta_desc').value.trim(),
+    meta_keywords: document.getElementById('f_meta_keywords').value.trim(),
+    og_title:      document.getElementById('f_og_title').value.trim(),
+    og_desc:       document.getElementById('f_og_desc').value.trim(),
+    og_image:      document.getElementById('f_og_image').value.trim(),
+    robots:        document.getElementById('f_robots').value,
+  };
+  const data = await apiFetch(`/seo/${slug}`, { method:'PUT', body: JSON.stringify(payload) });
+  if (data?.success) { toast('SEO saved!'); closeModal('editModal'); loadSeo(); }
+  else toast(data?.message || 'Failed', 'error');
+}
+
+document.addEventListener('DOMContentLoaded', loadSeo);
+</script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Hosting Plans – ShreeNova Tech Admin</title>
+<link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><img src="../../public/logo.png" alt="SNT" onerror="this.style.display='none'" /><span>ShreeNova Tech</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a class="nav-item" data-page="dashboard.html" href="dashboard.html"><span class="icon">📊</span><span>Dashboard</span></a>
+      <div class="nav-section">Management</div>
+      <a class="nav-item" data-page="bookings.html"  href="bookings.html"><span class="icon">📋</span><span>Bookings</span></a>
+      <a class="nav-item" data-page="payments.html"  href="payments.html"><span class="icon">💳</span><span>Payments</span></a>
+      <a class="nav-item" data-page="contacts.html"  href="contacts.html"><span class="icon">✉️</span><span>Contacts</span></a>
+      <div class="nav-section">Website</div>
+      <a class="nav-item" data-page="portfolio.html"    href="portfolio.html"><span class="icon">🖼️</span><span>Portfolio</span></a>
+      <a class="nav-item" data-page="pricing.html"      href="pricing.html"><span class="icon">💰</span><span>Pricing</span></a>
+      <a class="nav-item" data-page="testimonials.html" href="testimonials.html"><span class="icon">⭐</span><span>Testimonials</span></a>
+      <a class="nav-item" data-page="faqs.html"         href="faqs.html"><span class="icon">❓</span><span>FAQs</span></a>
+      <a class="nav-item" data-page="hosting.html"      href="hosting.html"><span class="icon">🌐</span><span>Hosting Plans</span></a>
+      <a class="nav-item" data-page="blog.html"         href="blog.html"><span class="icon">📝</span><span>Blog</span></a>
+      <div class="nav-section">System</div>
+      <a class="nav-item" data-page="media.html"    href="media.html"><span class="icon">🗂️</span><span>Media Manager</span></a>
+      <a class="nav-item" data-page="seo.html"      href="seo.html"><span class="icon">🔍</span><span>SEO Settings</span></a>
+      <a class="nav-item" data-page="users.html"    href="users.html"><span class="icon">👥</span><span>Users</span></a>
+      <a class="nav-item" data-page="settings.html" href="settings.html"><span class="icon">⚙️</span><span>Settings</span></a>
+    </nav>
+    <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-avatar user-initials">A</div><div class="sidebar-user-info"><strong class="user-name">Admin</strong><small class="user-role">super_admin</small></div></div></div>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <div class="topbar">
+      <div class="topbar-left"><button class="toggle-btn" id="sidebarToggle">☰</button><span class="page-title">Hosting Plans</span></div>
+      <div class="topbar-right">
+        <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Add Plan</button>
+        <button class="topbar-btn" onclick="logout()">🚪</button>
+        <div class="topbar-user"><div class="topbar-avatar user-initials">A</div><span class="topbar-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="card">
+        <div class="card-header"><span class="card-title">All Hosting Plans</span></div>
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Type</th><th>Price</th><th>Storage</th><th>Bandwidth</th><th>Featured</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="hostingBody"><tr><td colspan="8"><div class="empty-state"><div class="icon">⏳</div><p>Loading...</p></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-backdrop" id="editModal">
+  <div class="modal modal-lg">
+    <div class="modal-header"><span class="modal-title" id="modalTitle">Add Hosting Plan</span><button class="modal-close" onclick="closeModal('editModal')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="editId" />
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Plan Name <span>*</span></label><input class="form-control" id="f_name" /></div>
+        <div class="form-group"><label class="form-label">Type</label>
+          <select class="form-control" id="f_type">
+            <option value="shared">Shared</option><option value="cloud">Cloud</option>
+            <option value="vps">VPS</option><option value="wordpress">WordPress</option>
+            <option value="dedicated">Dedicated</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Price Display</label><input class="form-control" id="f_price" placeholder="₹99" /></div>
+        <div class="form-group"><label class="form-label">Per</label><input class="form-control" id="f_per" placeholder="/month" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Storage</label><input class="form-control" id="f_storage" placeholder="5 GB SSD" /></div>
+        <div class="form-group"><label class="form-label">Bandwidth</label><input class="form-control" id="f_bandwidth" placeholder="Unmetered" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Websites</label><input class="form-control" id="f_websites" placeholder="1" /></div>
+        <div class="form-group"><label class="form-label">Emails</label><input class="form-control" id="f_emails" placeholder="2" /></div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group"><label class="form-label">Description</label><textarea class="form-control" id="f_description" rows="2"></textarea></div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group"><label class="form-label">Features (one per line)</label><textarea class="form-control" id="f_features" rows="5" placeholder="Free SSL&#10;99.9% Uptime"></textarea></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Sort Order</label><input class="form-control" id="f_sort_order" type="number" value="0" /></div>
+        <div class="form-group" style="display:flex;gap:20px;align-items:flex-end;padding-bottom:4px">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;cursor:pointer"><input type="checkbox" id="f_is_featured" /> Featured</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;cursor:pointer"><input type="checkbox" id="f_is_active" checked /> Active</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="savePlan()">💾 Save Plan</button>
+      <button class="btn btn-outline" onclick="closeModal('editModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+<script>
+let allPlans = [];
+
+async function loadHosting() {
+  const data = await apiFetch('/hosting');
+  if (!data?.success) return;
+  allPlans = data.data;
+  const tbody = document.getElementById('hostingBody');
+  tbody.innerHTML = allPlans.length
+    ? allPlans.map(p => `<tr>
+        <td><strong>${p.name}</strong><br><small style="color:#64748b">${p.description||''}</small></td>
+        <td><span class="badge badge-blue">${p.type}</span></td>
+        <td><strong>${p.price}</strong><small style="color:#64748b"> ${p.per||''}</small></td>
+        <td>${p.storage||'—'}</td>
+        <td>${p.bandwidth||'—'}</td>
+        <td>${p.is_featured ? '⭐' : '—'}</td>
+        <td>${p.is_active ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-gray">Inactive</span>'}</td>
+        <td style="display:flex;gap:6px">
+          <button class="btn-icon" onclick="editPlan(${p.id})" title="Edit">✏️</button>
+          <button class="btn-icon" onclick="deletePlan(${p.id})" title="Delete" style="color:#ef4444">🗑️</button>
+        </td>
+      </tr>`).join('')
+    : '<tr><td colspan="8"><div class="empty-state"><div class="icon">🌐</div><p>No plans found</p></div></td></tr>';
+}
+
+function openAddModal() {
+  document.getElementById('modalTitle').textContent = 'Add Hosting Plan';
+  document.getElementById('editId').value = '';
+  ['f_name','f_price','f_per','f_storage','f_bandwidth','f_websites','f_emails','f_description','f_features'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f_per').value = '/month';
+  document.getElementById('f_sort_order').value = 0;
+  document.getElementById('f_is_featured').checked = false;
+  document.getElementById('f_is_active').checked = true;
+  openModal('editModal');
+}
+
+function editPlan(id) {
+  const p = allPlans.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('modalTitle').textContent = 'Edit Plan';
+  document.getElementById('editId').value = id;
+  document.getElementById('f_name').value = p.name || '';
+  document.getElementById('f_type').value = p.type || 'shared';
+  document.getElementById('f_price').value = p.price || '';
+  document.getElementById('f_per').value = p.per || '/month';
+  document.getElementById('f_storage').value = p.storage || '';
+  document.getElementById('f_bandwidth').value = p.bandwidth || '';
+  document.getElementById('f_websites').value = p.websites || '';
+  document.getElementById('f_emails').value = p.emails || '';
+  document.getElementById('f_description').value = p.description || '';
+  const features = typeof p.features === 'string' ? JSON.parse(p.features||'[]') : (p.features||[]);
+  document.getElementById('f_features').value = features.join('\n');
+  document.getElementById('f_sort_order').value = p.sort_order || 0;
+  document.getElementById('f_is_featured').checked = !!p.is_featured;
+  document.getElementById('f_is_active').checked = !!p.is_active;
+  openModal('editModal');
+}
+
+async function savePlan() {
+  const id = document.getElementById('editId').value;
+  const payload = {
+    name:        document.getElementById('f_name').value.trim(),
+    type:        document.getElementById('f_type').value,
+    price:       document.getElementById('f_price').value.trim(),
+    per:         document.getElementById('f_per').value.trim(),
+    storage:     document.getElementById('f_storage').value.trim(),
+    bandwidth:   document.getElementById('f_bandwidth').value.trim(),
+    websites:    document.getElementById('f_websites').value.trim(),
+    emails:      document.getElementById('f_emails').value.trim(),
+    description: document.getElementById('f_description').value.trim(),
+    features:    document.getElementById('f_features').value.split('\n').map(s=>s.trim()).filter(Boolean),
+    sort_order:  parseInt(document.getElementById('f_sort_order').value) || 0,
+    is_featured: document.getElementById('f_is_featured').checked ? 1 : 0,
+    is_active:   document.getElementById('f_is_active').checked ? 1 : 0,
+  };
+  if (!payload.name) { toast('Plan name is required', 'error'); return; }
+  const endpoint = id ? `/hosting/${id}` : '/hosting';
+  const method   = id ? 'PUT' : 'POST';
+  const data = await apiFetch(endpoint, { method, body: JSON.stringify(payload) });
+  if (data?.success) { toast(id ? 'Updated!' : 'Created!'); closeModal('editModal'); loadHosting(); }
+  else toast(data?.message || 'Failed', 'error');
+}
+
+async function deletePlan(id) {
+  if (!confirmDelete('Delete this hosting plan?')) return;
+  const data = await apiFetch(`/hosting/${id}`, { method:'DELETE' });
+  if (data?.success) { toast('Deleted'); loadHosting(); }
+  else toast(data?.message || 'Failed', 'error');
+}
+
+document.addEventListener('DOMContentLoaded', loadHosting);
+</script>
+</body>
+</html>

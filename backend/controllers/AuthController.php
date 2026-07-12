@@ -23,10 +23,6 @@ class AuthController {
 
         $token = generateToken($user);
 
-        // Update last login
-        $db->prepare('UPDATE admin_users SET last_login = NOW() WHERE id = ?')
-           ->bind_param('i', $user['id']) && $db->prepare('UPDATE admin_users SET last_login = NOW() WHERE id = ?')->execute();
-
         $stmt2 = $db->prepare('UPDATE admin_users SET last_login = NOW() WHERE id = ?');
         $stmt2->bind_param('i', $user['id']);
         $stmt2->execute();

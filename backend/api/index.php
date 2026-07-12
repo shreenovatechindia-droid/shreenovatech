@@ -1,6 +1,14 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
-header('Access-Control-Allow-Origin: *');
+
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
+$allowed = ['http://localhost:5173','http://localhost:3001','https://shreenovatech.in'];
+if (in_array($origin, $allowed)) {
+    header("Access-Control-Allow-Origin: $origin");
+    header('Access-Control-Allow-Credentials: true');
+} else {
+    header('Access-Control-Allow-Origin: *');
+}
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
 
@@ -188,6 +196,16 @@ switch ($resource) {
     case 'track':
         require_once __DIR__ . '/../controllers/TrackController.php';
         (new TrackController())->track();
+        break;
+
+    case 'notifications':
+        require_once __DIR__ . '/../controllers/NotificationsController.php';
+        $c = new NotificationsController();
+        if ($method === 'GET')                          $c->index();
+        elseif ($method === 'PUT' && $id === 'read-all') $c->markAllRead();
+        elseif ($method === 'PUT' && $id)               $c->markRead((int)$id);
+        elseif ($method === 'DELETE' && $id)            $c->destroy((int)$id);
+        else err('Not found', 404);
         break;
 
     default:

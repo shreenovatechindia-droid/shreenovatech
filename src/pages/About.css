@@ -691,6 +691,44 @@
   .ab-cta-inner h2  { font-size: 26px; }
   .ab-hero-btns     { flex-direction: column; }
   .ab-cta-btns      { flex-direction: column; align-items: center; }
+  .ab-trust-wrap    { padding: 32px 20px; }
+  .ab-trust-rating  { font-size: 40px; }
+  .ab-trust-big     { font-size: 36px; }
+  .ab-process-card  { flex-direction: column; text-align: center; gap: 12px; }
+  .ab-mvc-card      { padding: 28px 20px; }
+}
+@media (max-width: 425px) {
+  .ab-team-grid     { grid-template-columns: 1fr; }
+  .ab-stats-grid    { grid-template-columns: repeat(2, 1fr); }
+  .ab-hero-title    { font-size: 24px; }
+  .ab-section-title { font-size: 22px; }
+  .ab-section       { padding: 48px 0; }
+  .ab-hero          { padding: 48px 0 40px; }
+  .ab-mvc-grid      { grid-template-columns: 1fr; }
+  .ab-cta-inner h2  { font-size: 22px; }
+  .ab-cta-inner p   { font-size: 15px; }
+  .ab-trust-rating  { font-size: 34px; }
+  .ab-trust-big     { font-size: 30px; }
+  .ab-trust-wrap    { gap: 20px; padding: 24px 16px; }
+}
+
+/* ── Floating cards — hide on small screens to prevent overflow ── */
+@media (max-width: 576px) {
+  .ab-float-card { display: none; }
+  .ab-illustration { width: 260px; height: 260px; }
+  .ab-img-badge-1, .ab-img-badge-2 { display: none; }
+  .ab-hero-btns a, .ab-hero-btns button { width: 100%; justify-content: center; }
+  .ab-cta-btns a, .ab-cta-btns button  { width: 100%; justify-content: center; }
+}
+
+/* ── Founder modal — small screens ── */
+@media (max-width: 425px) {
+  .fm-modal { border-radius: 16px; }
+  .fm-right { padding: 20px 16px; }
+  .fm-left  { padding: 24px 16px; }
+  .fm-photo { width: 110px; height: 110px; }
+  .fm-achievements { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .fm-name  { font-size: 17px; }
 }
 
 /* ── Clickable team card ── */

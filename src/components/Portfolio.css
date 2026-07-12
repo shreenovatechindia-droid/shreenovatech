@@ -416,20 +416,22 @@
 
 /* Mobile */
 @media (max-width: 576px) {
+  .pm-backdrop { padding: 12px; }
   .pm-modal {
-    padding: 20px 16px;
+    padding: 18px 14px;
     border-radius: 18px;
     max-height: 95vh;
   }
   .pm-img-wrap {
-    min-height: 200px;
-    max-height: 320px;
+    min-height: 180px;
+    max-height: 280px;
   }
   .pm-title {
-    font-size: 24px;
+    font-size: 22px;
   }
   .pm-desc {
-    font-size: 14px;
+    font-size: 13.5px;
+    margin-bottom: 18px;
   }
   .pm-features {
     grid-template-columns: 1fr;
@@ -441,5 +443,12 @@
   .pm-btn-orange,
   .pm-btn-outline {
     width: 100%;
+    justify-content: center;
   }
+  .pm-tech-tags { gap: 6px; }
+  .pm-tag { font-size: 12px; padding: 6px 14px; }
+}
+@media (max-width: 425px) {
+  .pm-modal { padding: 14px 12px; }
+  .pm-title { font-size: 20px; }
 }

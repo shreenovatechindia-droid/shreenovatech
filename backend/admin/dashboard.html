@@ -58,6 +58,19 @@
       </div>
       <div class="topbar-right">
         <a href="../../index.html" target="_blank" class="btn btn-outline btn-sm">🌐 View Site</a>
+        <!-- Notification Bell -->
+        <div style="position:relative">
+          <button class="topbar-btn" id="notifBtn" onclick="toggleNotifPanel()" title="Notifications">🔔
+            <span id="notifBadge" style="display:none;position:absolute;top:4px;right:4px;min-width:18px;height:18px;background:#ef4444;color:#fff;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff">0</span>
+          </button>
+          <div id="notifPanel" style="display:none;position:absolute;right:0;top:52px;width:360px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,0.15);z-index:999;overflow:hidden">
+            <div style="padding:14px 18px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:14px;font-weight:700">🔔 Notifications</span>
+              <button onclick="markAllRead()" style="font-size:11px;color:#16a34a;background:none;border:none;cursor:pointer;font-weight:600">Mark all read</button>
+            </div>
+            <div id="notifList" style="max-height:380px;overflow-y:auto"></div>
+          </div>
+        </div>
         <button class="topbar-btn" onclick="logout()" title="Logout">🚪</button>
         <div class="topbar-user">
           <div class="topbar-avatar user-initials">A</div>
@@ -138,6 +151,97 @@
 </div>
 
 <script src="admin.js"></script>
+<script>
+// ── Notification Bell ─────────────────────────────────────────
+let notifOpen = false;
+
+function toggleNotifPanel() {
+  notifOpen = !notifOpen;
+  document.getElementById('notifPanel').style.display = notifOpen ? 'block' : 'none';
+  if (notifOpen) loadNotifications();
+}
+
+document.addEventListener('click', e => {
+  if (notifOpen && !e.target.closest('#notifBtn') && !e.target.closest('#notifPanel')) {
+    notifOpen = false;
+    document.getElementById('notifPanel').style.display = 'none';
+  }
+});
+
+async function loadNotifications() {
+  const data = await apiFetch('/notifications');
+  if (!data?.success) return;
+  const { notifications, unread } = data.data;
+
+  // Badge
+  const badge = document.getElementById('notifBadge');
+  if (unread > 0) {
+    badge.textContent = unread > 99 ? '99+' : unread;
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
+
+  // List
+  const list = document.getElementById('notifList');
+  if (!notifications.length) {
+    list.innerHTML = '<div style="padding:32px;text-align:center;color:#94a3b8;font-size:13px">🔔 No notifications yet</div>';
+    return;
+  }
+  list.innerHTML = notifications.map(n => `
+    <div onclick="readNotif(${n.id}, this)" style="padding:14px 18px;border-bottom:1px solid #f1f5f9;cursor:pointer;background:${n.is_read ? '#fff' : '#f0fdf4'};transition:.2s" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='${n.is_read ? '#fff' : '#f0fdf4'}'">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <div style="width:8px;height:8px;border-radius:50%;background:${n.is_read ? '#cbd5e1' : '#22c55e'};flex-shrink:0;margin-top:5px"></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:${n.is_read ? '500' : '700'};color:#0f172a;margin-bottom:3px">${n.title}</div>
+          <div style="font-size:11.5px;color:#64748b;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${n.message}</div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:4px">${fmtDateTime(n.created_at)}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+async function readNotif(id, el) {
+  await apiFetch(`/notifications/${id}`, { method: 'PUT' });
+  el.style.background = '#fff';
+  el.querySelector('div > div:first-child').style.background = '#cbd5e1';
+  el.querySelector('div > div:last-child > div:first-child').style.fontWeight = '500';
+  // Refresh badge
+  const data = await apiFetch('/notifications');
+  if (data?.success) {
+    const badge = document.getElementById('notifBadge');
+    const u = data.data.unread;
+    badge.textContent = u > 99 ? '99+' : u;
+    badge.style.display = u > 0 ? 'flex' : 'none';
+  }
+}
+
+async function markAllRead() {
+  await apiFetch('/notifications/read-all', { method: 'PUT' });
+  document.getElementById('notifBadge').style.display = 'none';
+  loadNotifications();
+}
+
+// Poll for new notifications every 60 seconds
+setInterval(async () => {
+  const data = await apiFetch('/notifications').catch(() => null);
+  if (!data?.success) return;
+  const badge = document.getElementById('notifBadge');
+  const u = data.data.unread;
+  badge.textContent = u > 99 ? '99+' : u;
+  badge.style.display = u > 0 ? 'flex' : 'none';
+}, 60000);
+
+// Initial badge load
+document.addEventListener('DOMContentLoaded', async () => {
+  const data = await apiFetch('/notifications').catch(() => null);
+  if (!data?.success) return;
+  const badge = document.getElementById('notifBadge');
+  const u = data.data.unread;
+  badge.textContent = u > 99 ? '99+' : u;
+  badge.style.display = u > 0 ? 'flex' : 'none';
+});
+</script>
 <script>
 let bookingsChart, revenueChart;
 

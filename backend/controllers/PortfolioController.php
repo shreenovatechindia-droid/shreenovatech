@@ -53,10 +53,6 @@ class PortfolioController {
 
         $db   = getDB();
         $stmt = $db->prepare('INSERT INTO portfolio (title,category,badge,industry,description,features,tech,image_url,live_url,github_url,client_name,completion_date,is_featured,sort_order,is_active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
-        $stmt->bind_param('ssssssssssssiiii', $title,$category,$badge,$industry,$desc,$features,$tech,$image_url,$live_url,$github_url,$client,$comp_date,$featured,$sort,$active);
-
-        // fix param count
-        $stmt = $db->prepare('INSERT INTO portfolio (title,category,badge,industry,description,features,tech,image_url,live_url,github_url,client_name,completion_date,is_featured,sort_order,is_active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
         $stmt->bind_param('sssssssssssssii', $title,$category,$badge,$industry,$desc,$features,$tech,$image_url,$live_url,$github_url,$client,$comp_date,$featured,$sort,$active);
         if (!$stmt->execute()) err('Failed to create project');
 

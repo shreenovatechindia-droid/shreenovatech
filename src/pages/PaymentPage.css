@@ -387,27 +387,49 @@
 }
 @media (max-width: 860px) {
   .pp-body { grid-template-columns: 1fr; }
-  .pp-sidebar { position: static; }
+  .pp-sidebar { position: static; order: -1; }
   .pp-title { font-size: 28px; }
   .pp-qr-section { flex-direction: column; align-items: center; }
   .pp-qr-img { width: 260px; height: 260px; }
   .pp-upi-apps { width: 100%; }
   .pp-progress-line { width: 48px; }
+  .pp-pkg-card, .pp-summary-card { max-width: 480px; margin: 0 auto; }
 }
 @media (max-width: 576px) {
   .pp-page { padding: 32px 0 70px; }
-  .pp-title { font-size: 24px; }
+  .pp-title { font-size: 22px; }
+  .pp-subtitle { font-size: 13px; }
   .pp-grid { grid-template-columns: 1fr; }
   .pp-btns { flex-direction: column; }
-  .pp-btn-submit, .pp-btn-orange, .pp-btn-outline { width: 100%; }
+  .pp-btn-submit, .pp-btn-orange, .pp-btn-outline { width: 100%; justify-content: center; }
   .pp-progress-label { display: none; }
   .pp-progress-line { width: 32px; }
-  .pp-card { padding: 22px 18px; }
-  .pp-qr-img { width: 240px; height: 240px; }
+  .pp-card { padding: 20px 16px; }
+  .pp-qr-img { width: 220px; height: 220px; }
   .pp-success-btns { flex-direction: column; align-items: stretch; }
   .pp-success-btn-green,
   .pp-success-btn-wa,
   .pp-success-btn-outline { justify-content: center; }
+  .pp-upload-box { padding: 32px 16px; }
+  .pp-pkg-card, .pp-summary-card { max-width: 100%; }
+}
+@media (max-width: 425px) {
+  .pp-title { font-size: 20px; }
+  .pp-qr-img { width: 200px; height: 200px; }
+  .pp-progress-step { width: 36px; height: 36px; font-size: 14px; }
+  .pp-card { padding: 16px 12px; }
+  .pp-input, .pp-select { height: 48px; font-size: 14px; }
+  .pp-btn-submit, .pp-btn-orange, .pp-btn-outline { height: 50px; font-size: 14px; }
+  .pp-upload-box { padding: 24px 12px; }
+  .pp-upload-icon-wrap { width: 52px; height: 52px; }
+  .pp-upload-text { font-size: 13.5px; }
+  .pp-success { padding: 48px 16px; }
+  .pp-success h2 { font-size: 24px; }
+  .pp-success-icon { width: 72px; height: 72px; font-size: 32px; }
+  .pp-pkg-header { padding: 18px 18px 14px; }
+  .pp-pkg-name { font-size: 17px; }
+  .pp-pkg-price { font-size: 26px; }
+  .pp-summary-card { padding: 16px; }
 }
 
 /* ── Service Selection ── */
@@ -472,10 +494,16 @@
 }
 
 @media (max-width: 860px) {
-  .pp-service-grid { grid-template-columns: repeat(2, 1fr); }
+  .pp-service-grid { grid-template-columns: repeat(3, 1fr); }
 }
 @media (max-width: 576px) {
-  .pp-service-grid { grid-template-columns: 1fr; }
+  .pp-service-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 425px) {
+  .pp-service-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .pp-service-card { padding: 14px 8px; }
+  .pp-service-icon { font-size: 22px; }
+  .pp-service-label { font-size: 11px; }
 }
 
 /* ── Customer Details Accordion ── */

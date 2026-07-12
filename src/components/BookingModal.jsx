@@ -4,6 +4,7 @@ import {
   FiUser, FiPhone, FiMail, FiGlobe, FiBriefcase,
   FiMapPin, FiMessageSquare, FiDownload,
 } from 'react-icons/fi';
+import { submitBooking } from '../utils/api';
 import './BookingModal.css';
 
 /* ── Constants ── */
@@ -110,7 +111,8 @@ export default function BookingModal({ onClose }) {
   const [errors, setErrors] = useState({});
   const [step, setStep]     = useState(0);
   const [success, setSuccess] = useState(false);
-  const [ref]               = useState(refId);
+  const [submitting, setSubmitting] = useState(false);
+  const [serverRef, setServerRef]   = useState('');
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -136,11 +138,41 @@ export default function BookingModal({ onClose }) {
 
   const prev = () => { setErrors({}); setStep(s => s - 1); };
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
     const errs = validateStep(2, form);
     if (Object.keys(errs).length) { setErrors(errs); return; }
-    setSuccess(true);
+    setSubmitting(true);
+    try {
+      const fd = new FormData();
+      fd.append('fullName',    form.fullName);
+      fd.append('mobile',      form.mobile);
+      fd.append('whatsapp',    form.whatsapp || form.mobile);
+      fd.append('email',       form.email);
+      fd.append('company',     form.company);
+      fd.append('business',    form.business || form.company);
+      fd.append('website',     form.website);
+      fd.append('city',        form.city);
+      fd.append('state',       form.state);
+      fd.append('country',     form.country || 'India');
+      fd.append('projectType', form.projectType);
+      fd.append('budget',      form.budget);
+      fd.append('timeline',    form.timeline || 'Flexible');
+      fd.append('description', form.description);
+      fd.append('services',    JSON.stringify(form.services));
+      if (form.logoFile)   fd.append('logoFile',   form.logoFile);
+      if (form.imagesFile) fd.append('imagesFile', form.imagesFile);
+      if (form.docsFile)   fd.append('docsFile',   form.docsFile);
+
+      const res = await submitBooking(fd);
+      setServerRef(res.data?.data?.ref_id || '');
+      setSuccess(true);
+    } catch (err) {
+      const msg = err?.response?.data?.message || 'Submission failed. Please try again.';
+      setErrors(p => ({ ...p, submit: msg }));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   /* ── Left panel ── */
@@ -364,16 +396,19 @@ export default function BookingModal({ onClose }) {
           {success ? (
             <div className="bm-success">
               <div className="bm-success-icon">✓</div>
-              <h3>Thank You!</h3>
-              <p className="bm-success-sub">Project Submitted Successfully</p>
-              <div className="bm-ref-badge">Reference ID: {ref}</div>
-              <p>Your project request has been submitted successfully.<br />Our team will contact you within 30 minutes.</p>
-              <div className="bm-contact-badge">⏱ Estimated Contact: Within 30 Minutes</div>
+              <h3>Thank You, {form.fullName}! 🎉</h3>
+              <p className="bm-success-sub">Booking Submitted Successfully</p>
+              <div className="bm-ref-badge">Reference ID: <strong>{serverRef}</strong></div>
+              <p>
+                Saved in our system. Our team will call you on <strong>{form.mobile}</strong> within <strong>30 minutes</strong>.<br />
+                Confirmation email sent to <strong>{form.email}</strong>.
+              </p>
+              <div className="bm-contact-badge">⏱ Status: Pending &nbsp;&bull;&nbsp; Est. Contact: 30 Minutes</div>
               <div className="bm-success-btns">
                 <button className="bm-success-btn-green" onClick={onClose}>
-                  <FiArrowLeft size={15}/> Go Home
+                  <FiArrowLeft size={15}/> Close
                 </button>
-                <a className="bm-success-btn-wa" href="https://wa.me/919999999999" target="_blank" rel="noreferrer">
+                <a className="bm-success-btn-wa" href="https://wa.me/918987050207" target="_blank" rel="noreferrer">
                   💬 WhatsApp Support
                 </a>
                 <button className="bm-success-btn-outline" onClick={()=>window.print()}>
@@ -388,14 +423,19 @@ export default function BookingModal({ onClose }) {
                 {steps[step]}
               </form>
               <div className="bm-footer">
+                {errors.submit && (
+                  <div style={{width:'100%',padding:'10px 14px',background:'#fef2f2',border:'1px solid #fecaca',borderRadius:8,fontSize:13,color:'#dc2626',fontWeight:600,marginBottom:8}}>
+                    ⚠️ {errors.submit}
+                  </div>
+                )}
                 {step > 0 && (
                   <button type="button" className="bm-btn-prev" onClick={prev}>
                     <FiArrowLeft size={15}/> Previous
                   </button>
                 )}
                 {isLast ? (
-                  <button type="button" className="bm-btn-submit" onClick={handleSubmit}>
-                    <FiSend size={15}/> Submit Project
+                  <button type="button" className="bm-btn-submit" onClick={handleSubmit} disabled={submitting}>
+                    <FiSend size={15}/> {submitting ? 'Submitting...' : 'Submit Project'}
                   </button>
                 ) : (
                   <button type="button" className="bm-btn-next" onClick={next}>

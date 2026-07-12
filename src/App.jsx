@@ -1,4 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+
+// Redirect /admin to the React admin panel
+function AdminRedirect() {
+  useEffect(() => {
+    window.location.href = '/admin/';
+  }, []);
+  return null;
+}
 import Home from './pages/Home';
 import PaymentPage from './pages/PaymentPage';
 import BookingPage from './pages/BookingPage';
@@ -57,6 +66,10 @@ export default function App() {
 
         {/* About */}
         <Route path="/about" element={<AboutPage />} />
+
+        {/* Admin Panel */}
+        <Route path="/admin" element={<AdminRedirect />} />
+        <Route path="/admin/*" element={<AdminRedirect />} />
 
         {/* Hash-section redirects */}
         <Route path="/portfolio" element={<Navigate to="/#portfolio" replace />} />

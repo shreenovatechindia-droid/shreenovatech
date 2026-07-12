@@ -193,18 +193,31 @@ export default function BookingPage() {
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setSubmitting(true);
     try {
-      const res = await submitBooking({
-        fullName: form.fullName, mobile: form.mobile, whatsapp: form.mobile,
-        email: form.email, company: form.company, business: form.company,
-        website: '', city: '', state: '', country: 'India',
-        projectType: form.projectType, budget: form.budget, timeline: 'Flexible',
-        description: form.description, services: form.services,
-      });
-      setServerRef(res.data?.data?.ref_id || ref);
+      const fd = new FormData();
+      fd.append('fullName',    form.fullName);
+      fd.append('mobile',      form.mobile);
+      fd.append('whatsapp',    form.mobile);
+      fd.append('email',       form.email);
+      fd.append('company',     form.company);
+      fd.append('business',    form.company);
+      fd.append('website',     '');
+      fd.append('city',        '');
+      fd.append('state',       '');
+      fd.append('country',     'India');
+      fd.append('projectType', form.projectType);
+      fd.append('budget',      form.budget);
+      fd.append('timeline',    'Flexible');
+      fd.append('description', form.description);
+      fd.append('services',    JSON.stringify(form.services));
+      if (form.logoFile)   fd.append('logoFile',   form.logoFile);
+      if (form.imagesFile) fd.append('imagesFile', form.imagesFile);
+
+      const res = await submitBooking(fd);
+      setServerRef(res.data?.data?.ref_id || '');
       setSuccess(true);
-    } catch {
-      setServerRef(ref);
-      setSuccess(true);
+    } catch (err) {
+      const msg = err?.response?.data?.message || 'Submission failed. Please try again.';
+      setErrors({ submit: msg });
     } finally {
       setSubmitting(false);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -366,6 +379,11 @@ export default function BookingPage() {
           <FiSend size={15}/> {submitting ? 'Submitting...' : 'Submit Project'}
         </button>
       </div>
+      {errors.submit && (
+        <div style={{marginTop:12,padding:'12px 16px',background:'#fef2f2',border:'1px solid #fecaca',borderRadius:10,fontSize:13,color:'#dc2626',fontWeight:600}}>
+          ⚠️ {errors.submit}
+        </div>
+      )}
     </>
   );
 
@@ -394,11 +412,15 @@ export default function BookingPage() {
           {success ? (
             <div className="bp-success">
               <div className="bp-success-icon">✓</div>
-              <h2>Project Submitted!</h2>
-              <p className="bp-success-sub">Thank you, {form.fullName || 'there'}!</p>
-              <div className="bp-ref-badge">Reference ID: {serverRef || ref}</div>
-              <p>Our team will contact you within 30 minutes.<br />Check your email for confirmation.</p>
-              <div className="bp-contact-badge">⏱ Estimated Contact: Within 30 Minutes</div>
+              <h2>Booking Submitted!</h2>
+              <p className="bp-success-sub">Thank you, {form.fullName}! 🎉</p>
+              <div className="bp-ref-badge">Reference ID: <strong>{serverRef}</strong></div>
+              <p>
+                Your booking is saved in our system.<br />
+                Our team will contact you on <strong>{form.mobile}</strong> within <strong>30 minutes</strong>.<br />
+                A confirmation email has been sent to <strong>{form.email}</strong>.
+              </p>
+              <div className="bp-contact-badge">⏱ Status: Pending &nbsp;&bull;&nbsp; Estimated Contact: Within 30 Minutes</div>
               <div className="bp-success-btns">
                 <Link to="/" className="bp-success-btn-green"><FiArrowLeft size={15}/> Go Home</Link>
                 <a className="bp-success-btn-wa" href="https://wa.me/918987050207" target="_blank" rel="noreferrer">💬 WhatsApp Support</a>

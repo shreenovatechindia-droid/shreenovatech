@@ -42,9 +42,7 @@
     </div>
 
     <div class="page-body">
-      <div id="pricingCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:24px">
-        <div style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8">Loading...</div>
-      </div>
+      <div id="plansContainer" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:20px"></div>
     </div>
   </div>
 </div>
@@ -52,31 +50,33 @@
 <!-- Edit Modal -->
 <div class="modal-backdrop" id="editModal">
   <div class="modal modal-lg">
-    <div class="modal-header"><span class="modal-title" id="editTitle">Edit Plan</span><button class="modal-close" onclick="closeModal('editModal')">✕</button></div>
+    <div class="modal-header"><span class="modal-title" id="modalTitle">Edit Plan</span><button class="modal-close" onclick="closeModal('editModal')">✕</button></div>
     <div class="modal-body">
+      <input type="hidden" id="editId" />
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Plan Name</label><input class="form-control" id="eName" /></div>
-        <div class="form-group"><label class="form-label">Price (display)</label><input class="form-control" id="ePrice" placeholder="₹9,999" /></div>
+        <div class="form-group"><label class="form-label">Plan Name <span>*</span></label><input class="form-control" id="f_name" /></div>
+        <div class="form-group"><label class="form-label">Price Display</label><input class="form-control" id="f_price" placeholder="₹9,999" /></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Price (number)</label><input class="form-control" id="ePriceNum" type="number" /></div>
-        <div class="form-group"><label class="form-label">Renewal Text</label><input class="form-control" id="eRenewal" /></div>
+        <div class="form-group"><label class="form-label">Price (Number)</label><input class="form-control" id="f_price_num" type="number" /></div>
+        <div class="form-group"><label class="form-label">Renewal Text</label><input class="form-control" id="f_renewal" /></div>
       </div>
       <div class="form-row full">
-        <div class="form-group"><label class="form-label">Description</label><input class="form-control" id="eDesc" /></div>
+        <div class="form-group"><label class="form-label">Description</label><textarea class="form-control" id="f_description" rows="2"></textarea></div>
       </div>
       <div class="form-row full">
-        <div class="form-group"><label class="form-label">Features (one per line)</label><textarea class="form-control" id="eFeatures" rows="8"></textarea></div>
+        <div class="form-group"><label class="form-label">Features (one per line)</label><textarea class="form-control" id="f_features" rows="8" placeholder="Feature 1&#10;Feature 2&#10;Feature 3"></textarea></div>
       </div>
       <div class="form-row">
-        <div class="form-group" style="flex-direction:row;align-items:center;gap:12px;padding-top:8px">
-          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" id="eFeatured" /> Most Popular</label>
-          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" id="eActive" checked /> Active</label>
+        <div class="form-group"><label class="form-label">Sort Order</label><input class="form-control" id="f_sort_order" type="number" value="0" /></div>
+        <div class="form-group" style="display:flex;gap:20px;align-items:flex-end;padding-bottom:4px">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;cursor:pointer"><input type="checkbox" id="f_is_featured" /> Featured</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;cursor:pointer"><input type="checkbox" id="f_is_active" checked /> Active</label>
         </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-primary" onclick="savePlan()">💾 Save Changes</button>
+      <button class="btn btn-primary" onclick="savePlan()">💾 Save Plan</button>
       <button class="btn btn-outline" onclick="closeModal('editModal')">Cancel</button>
     </div>
   </div>
@@ -84,64 +84,67 @@
 
 <script src="admin.js"></script>
 <script>
-let editId = null;
+let allPlans = [];
 
 async function loadPricing() {
   const data = await apiFetch('/pricing');
-  const container = document.getElementById('pricingCards');
-  if (!data?.success) { container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#ef4444">Failed to load</div>'; return; }
-  const plans = data.data;
-  const colors = { SILVER:'#94a3b8', GOLDEN:'#f59e0b', DIAMOND:'#6366f1' };
-  container.innerHTML = plans.map(p => `
+  if (!data?.success) return;
+  allPlans = data.data;
+  const container = document.getElementById('plansContainer');
+  container.innerHTML = allPlans.map(p => `
     <div class="card">
-      <div style="background:${colors[p.badge]||'#22c55e'};padding:20px;color:#fff;border-radius:14px 14px 0 0">
-        <div style="font-size:12px;font-weight:700;opacity:.8;text-transform:uppercase;margin-bottom:4px">✦ ${p.badge}</div>
-        <div style="font-size:22px;font-weight:800">${p.name}</div>
-        <div style="font-size:32px;font-weight:900;margin-top:8px">${p.price}</div>
-        <div style="font-size:12px;opacity:.8;margin-top:4px">${p.renewal||''}</div>
-        ${p.is_featured?'<div style="margin-top:8px;background:rgba(255,255,255,.2);display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700">⭐ MOST POPULAR</div>':''}
+      <div class="card-header">
+        <span class="card-title">${p.badge} — ${p.name}</span>
+        <div style="display:flex;gap:8px">
+          ${p.is_featured ? '<span class="badge badge-yellow">⭐ Featured</span>' : ''}
+          ${p.is_active ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-gray">Inactive</span>'}
+        </div>
       </div>
       <div class="card-body">
-        <p style="font-size:13px;color:#64748b;margin-bottom:12px">${p.description||''}</p>
-        <ul style="list-style:none;padding:0;margin-bottom:16px">
-          ${(p.features||[]).map(f=>`<li style="font-size:13px;padding:4px 0;display:flex;align-items:center;gap:8px"><span style="color:#22c55e;font-weight:700">✓</span>${f}</li>`).join('')}
+        <div style="font-size:28px;font-weight:900;color:#f97316;margin-bottom:8px">${p.price}</div>
+        <div style="font-size:13px;color:#64748b;margin-bottom:12px">${p.renewal||''}</div>
+        <div style="font-size:13px;color:#374151;margin-bottom:16px">${p.description||''}</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:20px">
+          ${(p.features||[]).map(f=>`<li style="font-size:13px;display:flex;align-items:center;gap:8px"><span style="color:#22c55e;font-weight:700">✓</span>${f}</li>`).join('')}
         </ul>
-        <button class="btn btn-primary" style="width:100%" onclick="editPlan(${p.id})">✏️ Edit Plan</button>
+        <button class="btn btn-primary btn-sm" onclick="editPlan(${p.id})">✏️ Edit Plan</button>
       </div>
     </div>`).join('');
 }
 
-async function editPlan(id) {
-  const data = await apiFetch('/pricing');
-  if (!data?.success) return;
-  const plan = data.data.find(p => p.id === id);
-  if (!plan) return;
-  editId = id;
-  document.getElementById('editTitle').textContent = `Edit ${plan.name}`;
-  document.getElementById('eName').value     = plan.name || '';
-  document.getElementById('ePrice').value    = plan.price || '';
-  document.getElementById('ePriceNum').value = plan.price_num || '';
-  document.getElementById('eRenewal').value  = plan.renewal || '';
-  document.getElementById('eDesc').value     = plan.description || '';
-  document.getElementById('eFeatures').value = (plan.features||[]).join('\n');
-  document.getElementById('eFeatured').checked = !!plan.is_featured;
-  document.getElementById('eActive').checked   = !!plan.is_active;
+function editPlan(id) {
+  const p = allPlans.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('modalTitle').textContent = `Edit ${p.name}`;
+  document.getElementById('editId').value = id;
+  document.getElementById('f_name').value = p.name || '';
+  document.getElementById('f_price').value = p.price || '';
+  document.getElementById('f_price_num').value = p.price_num || 0;
+  document.getElementById('f_renewal').value = p.renewal || '';
+  document.getElementById('f_description').value = p.description || '';
+  document.getElementById('f_features').value = (p.features || []).join('\n');
+  document.getElementById('f_sort_order').value = p.sort_order || 0;
+  document.getElementById('f_is_featured').checked = !!p.is_featured;
+  document.getElementById('f_is_active').checked = !!p.is_active;
   openModal('editModal');
 }
 
 async function savePlan() {
+  const id = document.getElementById('editId').value;
+  if (!id) return;
   const payload = {
-    name:       document.getElementById('eName').value.trim(),
-    price:      document.getElementById('ePrice').value.trim(),
-    price_num:  parseInt(document.getElementById('ePriceNum').value)||0,
-    renewal:    document.getElementById('eRenewal').value.trim(),
-    description:document.getElementById('eDesc').value.trim(),
-    features:   document.getElementById('eFeatures').value.split('\n').map(s=>s.trim()).filter(Boolean),
-    is_featured:document.getElementById('eFeatured').checked ? 1 : 0,
-    is_active:  document.getElementById('eActive').checked ? 1 : 0,
+    name:        document.getElementById('f_name').value.trim(),
+    price:       document.getElementById('f_price').value.trim(),
+    price_num:   parseInt(document.getElementById('f_price_num').value) || 0,
+    renewal:     document.getElementById('f_renewal').value.trim(),
+    description: document.getElementById('f_description').value.trim(),
+    features:    document.getElementById('f_features').value.split('\n').map(s=>s.trim()).filter(Boolean),
+    sort_order:  parseInt(document.getElementById('f_sort_order').value) || 0,
+    is_featured: document.getElementById('f_is_featured').checked ? 1 : 0,
+    is_active:   document.getElementById('f_is_active').checked ? 1 : 0,
   };
-  const data = await apiFetch(`/pricing/${editId}`, { method:'PUT', body: JSON.stringify(payload) });
-  if (data?.success) { toast('Plan updated! Changes are live on the website.'); closeModal('editModal'); loadPricing(); }
+  const data = await apiFetch(`/pricing/${id}`, { method:'PUT', body: JSON.stringify(payload) });
+  if (data?.success) { toast('Plan updated!'); closeModal('editModal'); loadPricing(); }
   else toast(data?.message || 'Failed', 'error');
 }
 

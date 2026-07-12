@@ -10,11 +10,12 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo"><img src="../../public/logo.png" alt="SNT" onerror="this.style.display='none'" /><span>ShreeNova Tech</span></div>
     <nav class="sidebar-nav">
-      <div class="nav-section">Main</div><a class="nav-item" data-page="dashboard.html" href="dashboard.html"><span class="icon">📊</span><span>Dashboard</span></a>
+      <div class="nav-section">Main</div>
+      <a class="nav-item" data-page="dashboard.html" href="dashboard.html"><span class="icon">📊</span><span>Dashboard</span></a>
       <div class="nav-section">Management</div>
-      <a class="nav-item" data-page="bookings.html" href="bookings.html"><span class="icon">📋</span><span>Bookings</span></a>
-      <a class="nav-item" data-page="payments.html" href="payments.html"><span class="icon">💳</span><span>Payments</span></a>
-      <a class="nav-item" data-page="contacts.html" href="contacts.html"><span class="icon">✉️</span><span>Contacts</span></a>
+      <a class="nav-item" data-page="bookings.html"  href="bookings.html"><span class="icon">📋</span><span>Bookings</span></a>
+      <a class="nav-item" data-page="payments.html"  href="payments.html"><span class="icon">💳</span><span>Payments</span></a>
+      <a class="nav-item" data-page="contacts.html"  href="contacts.html"><span class="icon">✉️</span><span>Contacts</span></a>
       <div class="nav-section">Website</div>
       <a class="nav-item" data-page="portfolio.html"    href="portfolio.html"><span class="icon">🖼️</span><span>Portfolio</span></a>
       <a class="nav-item" data-page="pricing.html"      href="pricing.html"><span class="icon">💰</span><span>Pricing</span></a>
@@ -30,73 +31,148 @@
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-avatar user-initials">A</div><div class="sidebar-user-info"><strong class="user-name">Admin</strong><small class="user-role">super_admin</small></div></div></div>
   </aside>
+
   <div class="main-content" id="mainContent">
     <div class="topbar">
       <div class="topbar-left"><button class="toggle-btn" id="sidebarToggle">☰</button><span class="page-title">FAQs</span></div>
       <div class="topbar-right">
-        <button class="btn btn-primary btn-sm" onclick="openAdd()">+ Add FAQ</button>
+        <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Add FAQ</button>
         <button class="topbar-btn" onclick="logout()">🚪</button>
         <div class="topbar-user"><div class="topbar-avatar user-initials">A</div><span class="topbar-name user-name">Admin</span></div>
       </div>
     </div>
+
     <div class="page-body">
       <div class="filter-bar">
-        <select class="filter-select" id="catFilter" onchange="load()">
+        <select class="filter-select" id="catFilter" onchange="loadFaqs()">
           <option value="">All Categories</option>
-          <option value="general">General</option><option value="hosting">Hosting</option>
-          <option value="seo">SEO</option><option value="payment">Payment</option>
+          <option value="general">General</option>
+          <option value="hosting">Hosting</option>
+          <option value="seo">SEO</option>
         </select>
       </div>
-      <div class="card"><div class="card-body" style="padding:0">
-        <div class="table-wrap"><table>
-          <thead><tr><th>Category</th><th>Question</th><th>Answer</th><th>Order</th><th>Actions</th></tr></thead>
-          <tbody id="tbody"><tr><td colspan="5"><div class="empty-state"><p>Loading...</p></div></td></tr></tbody>
-        </table></div>
-      </div></div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">All FAQs</span><span id="totalCount" style="font-size:13px;color:#64748b"></span></div>
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Category</th><th>Question</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="faqsBody"><tr><td colspan="5"><div class="empty-state"><div class="icon">⏳</div><p>Loading...</p></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<div class="modal-backdrop" id="formModal">
-  <div class="modal">
-    <div class="modal-header"><span class="modal-title" id="formTitle">Add FAQ</span><button class="modal-close" onclick="closeModal('formModal')">✕</button></div>
+<!-- Add/Edit Modal -->
+<div class="modal-backdrop" id="editModal">
+  <div class="modal modal-lg">
+    <div class="modal-header"><span class="modal-title" id="modalTitle">Add FAQ</span><button class="modal-close" onclick="closeModal('editModal')">✕</button></div>
     <div class="modal-body">
-      <div class="form-row"><div class="form-group"><label class="form-label">Category</label><select class="form-control" id="fCat"><option value="general">General</option><option value="hosting">Hosting</option><option value="seo">SEO</option><option value="payment">Payment</option></select></div><div class="form-group"><label class="form-label">Sort Order</label><input class="form-control" id="fSort" type="number" value="0" /></div></div>
-      <div class="form-row full"><div class="form-group"><label class="form-label">Question <span>*</span></label><input class="form-control" id="fQ" /></div></div>
-      <div class="form-row full"><div class="form-group"><label class="form-label">Answer <span>*</span></label><textarea class="form-control" id="fA" rows="4"></textarea></div></div>
+      <input type="hidden" id="editId" />
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Category</label>
+          <select class="form-control" id="f_category">
+            <option value="general">General</option>
+            <option value="hosting">Hosting</option>
+            <option value="seo">SEO</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Sort Order</label><input class="form-control" id="f_sort_order" type="number" value="0" /></div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group"><label class="form-label">Question <span>*</span></label><input class="form-control" id="f_question" /></div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group"><label class="form-label">Answer <span>*</span></label><textarea class="form-control" id="f_answer" rows="5"></textarea></div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group"><label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;cursor:pointer"><input type="checkbox" id="f_is_active" checked /> Active</label></div>
+      </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-primary" onclick="save()">💾 Save</button><button class="btn btn-outline" onclick="closeModal('formModal')">Cancel</button></div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="saveFaq()">💾 Save FAQ</button>
+      <button class="btn btn-outline" onclick="closeModal('editModal')">Cancel</button>
+    </div>
   </div>
 </div>
 
 <script src="admin.js"></script>
 <script>
-let editId=null;
-async function load(){
-  const cat=document.getElementById('catFilter').value;
-  const data=await apiFetch('/faq'+(cat?`?category=${cat}`:''));
-  const tbody=document.getElementById('tbody');
-  if(!data?.success)return;
-  tbody.innerHTML=data.data.length
-    ?data.data.map(f=>`<tr><td><span class="badge badge-blue">${f.category}</span></td><td style="max-width:200px">${f.question}</td><td style="max-width:200px;color:#64748b;font-size:12px">${f.answer}</td><td>${f.sort_order}</td><td style="display:flex;gap:6px"><button class="btn-icon" onclick="edit(${f.id})">✏️</button><button class="btn-icon" onclick="del(${f.id})" style="color:#ef4444">🗑️</button></td></tr>`).join('')
-    :'<tr><td colspan="5"><div class="empty-state"><p>No FAQs found</p></div></td></tr>';
+let allFaqs = [];
+
+async function loadFaqs() {
+  const cat = document.getElementById('catFilter').value;
+  const url = cat ? `/faq?category=${cat}` : '/faq?all=1';
+  const data = await apiFetch(url);
+  if (!data?.success) return;
+  allFaqs = data.data;
+  document.getElementById('totalCount').textContent = `Total: ${allFaqs.length}`;
+  const tbody = document.getElementById('faqsBody');
+  tbody.innerHTML = allFaqs.length
+    ? allFaqs.map((f, i) => `<tr>
+        <td>${i + 1}</td>
+        <td><span class="badge badge-blue">${f.category}</span></td>
+        <td style="max-width:300px">${f.question}</td>
+        <td>${f.is_active ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-gray">Inactive</span>'}</td>
+        <td style="display:flex;gap:6px">
+          <button class="btn-icon" onclick="editFaq(${f.id})" title="Edit">✏️</button>
+          <button class="btn-icon" onclick="deleteFaq(${f.id})" title="Delete" style="color:#ef4444">🗑️</button>
+        </td>
+      </tr>`).join('')
+    : '<tr><td colspan="5"><div class="empty-state"><div class="icon">❓</div><p>No FAQs found</p></div></td></tr>';
 }
-function openAdd(){editId=null;document.getElementById('formTitle').textContent='Add FAQ';['fQ','fA'].forEach(id=>document.getElementById(id).value='');document.getElementById('fCat').value='general';document.getElementById('fSort').value=0;openModal('formModal');}
-async function edit(id){
-  const data=await apiFetch('/faq');const f=data?.data?.find(x=>x.id===id);if(!f)return;
-  editId=id;document.getElementById('formTitle').textContent='Edit FAQ';
-  document.getElementById('fCat').value=f.category||'general';document.getElementById('fQ').value=f.question||'';document.getElementById('fA').value=f.answer||'';document.getElementById('fSort').value=f.sort_order||0;
-  openModal('formModal');
+
+function openAddModal() {
+  document.getElementById('modalTitle').textContent = 'Add FAQ';
+  document.getElementById('editId').value = '';
+  document.getElementById('f_question').value = '';
+  document.getElementById('f_answer').value = '';
+  document.getElementById('f_sort_order').value = 0;
+  document.getElementById('f_is_active').checked = true;
+  openModal('editModal');
 }
-async function save(){
-  const q=document.getElementById('fQ').value.trim(),a=document.getElementById('fA').value.trim();
-  if(!q||!a){toast('Question and answer required','error');return;}
-  const payload={category:document.getElementById('fCat').value,question:q,answer:a,sort_order:parseInt(document.getElementById('fSort').value)||0,is_active:1};
-  const data=await apiFetch(editId?`/faq/${editId}`:'/faq',{method:editId?'PUT':'POST',body:JSON.stringify(payload)});
-  if(data?.success){toast(editId?'Updated!':'Added!');closeModal('formModal');load();}else toast(data?.message||'Failed','error');
+
+function editFaq(id) {
+  const f = allFaqs.find(x => x.id === id);
+  if (!f) return;
+  document.getElementById('modalTitle').textContent = 'Edit FAQ';
+  document.getElementById('editId').value = id;
+  document.getElementById('f_category').value = f.category || 'general';
+  document.getElementById('f_question').value = f.question || '';
+  document.getElementById('f_answer').value = f.answer || '';
+  document.getElementById('f_sort_order').value = f.sort_order || 0;
+  document.getElementById('f_is_active').checked = !!f.is_active;
+  openModal('editModal');
 }
-async function del(id){if(!confirmDelete('Delete this FAQ?'))return;const data=await apiFetch(`/faq/${id}`,{method:'DELETE'});if(data?.success){toast('Deleted');load();}else toast('Failed','error');}
-document.addEventListener('DOMContentLoaded',load);
+
+async function saveFaq() {
+  const id = document.getElementById('editId').value;
+  const payload = {
+    category:   document.getElementById('f_category').value,
+    question:   document.getElementById('f_question').value.trim(),
+    answer:     document.getElementById('f_answer').value.trim(),
+    sort_order: parseInt(document.getElementById('f_sort_order').value) || 0,
+    is_active:  document.getElementById('f_is_active').checked ? 1 : 0,
+  };
+  if (!payload.question || !payload.answer) { toast('Question and answer are required', 'error'); return; }
+  const endpoint = id ? `/faq/${id}` : '/faq';
+  const method   = id ? 'PUT' : 'POST';
+  const data = await apiFetch(endpoint, { method, body: JSON.stringify(payload) });
+  if (data?.success) { toast(id ? 'Updated!' : 'Created!'); closeModal('editModal'); loadFaqs(); }
+  else toast(data?.message || 'Failed', 'error');
+}
+
+async function deleteFaq(id) {
+  if (!confirmDelete('Delete this FAQ?')) return;
+  const data = await apiFetch(`/faq/${id}`, { method:'DELETE' });
+  if (data?.success) { toast('Deleted'); loadFaqs(); }
+  else toast(data?.message || 'Failed', 'error');
+}
+
+document.addEventListener('DOMContentLoaded', loadFaqs);
 </script>
 </body>
 </html>

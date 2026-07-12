@@ -754,9 +754,9 @@
   .stat-label { font-size: 17px; }
 }
 @media (max-width: 576px) {
-  .stats-grid { grid-template-columns: 1fr; padding: 30px 16px; }
-  .stat-num { font-size: 40px; }
-  .stat-label { font-size: 18px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); padding: 30px 16px; gap: 16px 0; }
+  .stat-num { font-size: 32px; }
+  .stat-label { font-size: 14px; }
 }
 
 /* ===== TESTIMONIALS ===== */

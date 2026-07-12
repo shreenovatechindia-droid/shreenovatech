@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Media Manager – ShreeNova Tech Admin</title>
+<link rel="stylesheet" href="admin.css" />
+<style>
+.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+.media-item{background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;transition:.2s;cursor:pointer}
+.media-item:hover{box-shadow:0 4px 20px rgba(0,0,0,.1);transform:translateY(-2px)}
+.media-thumb{width:100%;height:120px;object-fit:cover;display:block;background:#f8fafc}
+.media-thumb.pdf{display:flex;align-items:center;justify-content:center;font-size:40px;background:#fef2f2}
+.media-info{padding:10px 12px}
+.media-name{font-size:12px;font-weight:600;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.media-size{font-size:11px;color:#94a3b8;margin-top:2px}
+.media-actions{display:flex;gap:6px;margin-top:8px}
+.upload-zone{border:2px dashed #cbd5e1;border-radius:14px;padding:40px;text-align:center;cursor:pointer;transition:.2s;background:#f8fafc}
+.upload-zone:hover{border-color:#22c55e;background:#f0fdf4}
+.upload-zone input{display:none}
+</style>
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><img src="../../public/logo.png" alt="SNT" onerror="this.style.display='none'" /><span>ShreeNova Tech</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a class="nav-item" data-page="dashboard.html" href="dashboard.html"><span class="icon">📊</span><span>Dashboard</span></a>
+      <div class="nav-section">Management</div>
+      <a class="nav-item" data-page="bookings.html"  href="bookings.html"><span class="icon">📋</span><span>Bookings</span></a>
+      <a class="nav-item" data-page="payments.html"  href="payments.html"><span class="icon">💳</span><span>Payments</span></a>
+      <a class="nav-item" data-page="contacts.html"  href="contacts.html"><span class="icon">✉️</span><span>Contacts</span></a>
+      <div class="nav-section">Website</div>
+      <a class="nav-item" data-page="portfolio.html"    href="portfolio.html"><span class="icon">🖼️</span><span>Portfolio</span></a>
+      <a class="nav-item" data-page="pricing.html"      href="pricing.html"><span class="icon">💰</span><span>Pricing</span></a>
+      <a class="nav-item" data-page="testimonials.html" href="testimonials.html"><span class="icon">⭐</span><span>Testimonials</span></a>
+      <a class="nav-item" data-page="faqs.html"         href="faqs.html"><span class="icon">❓</span><span>FAQs</span></a>
+      <a class="nav-item" data-page="hosting.html"      href="hosting.html"><span class="icon">🌐</span><span>Hosting Plans</span></a>
+      <a class="nav-item" data-page="blog.html"         href="blog.html"><span class="icon">📝</span><span>Blog</span></a>
+      <div class="nav-section">System</div>
+      <a class="nav-item" data-page="media.html"    href="media.html"><span class="icon">🗂️</span><span>Media Manager</span></a>
+      <a class="nav-item" data-page="seo.html"      href="seo.html"><span class="icon">🔍</span><span>SEO Settings</span></a>
+      <a class="nav-item" data-page="users.html"    href="users.html"><span class="icon">👥</span><span>Users</span></a>
+      <a class="nav-item" data-page="settings.html" href="settings.html"><span class="icon">⚙️</span><span>Settings</span></a>
+    </nav>
+    <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-avatar user-initials">A</div><div class="sidebar-user-info"><strong class="user-name">Admin</strong><small class="user-role">super_admin</small></div></div></div>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <div class="topbar">
+      <div class="topbar-left"><button class="toggle-btn" id="sidebarToggle">☰</button><span class="page-title">Media Manager</span></div>
+      <div class="topbar-right">
+        <button class="topbar-btn" onclick="logout()">🚪</button>
+        <div class="topbar-user"><div class="topbar-avatar user-initials">A</div><span class="topbar-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <!-- Upload Zone -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-body">
+          <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+            <input type="file" id="fileInput" multiple accept="image/*,.pdf" onchange="uploadFiles(this.files)" />
+            <div style="font-size:40px;margin-bottom:12px">📁</div>
+            <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:6px">Click to Upload Files</div>
+            <div style="font-size:13px;color:#64748b">JPG, PNG, GIF, WebP, PDF — Max 10MB each</div>
+          </div>
+          <div id="uploadProgress" style="margin-top:12px"></div>
+        </div>
+      </div>
+
+      <!-- Filter -->
+      <div class="filter-bar">
+        <select class="filter-select" id="folderFilter" onchange="loadMedia()">
+          <option value="">All Files</option>
+          <option value="general">General</option>
+          <option value="portfolio">Portfolio</option>
+          <option value="payments">Payments</option>
+          <option value="logos">Logos</option>
+          <option value="blogs">Blogs</option>
+        </select>
+        <span id="totalCount" style="font-size:13px;color:#64748b;margin-left:8px"></span>
+      </div>
+
+      <!-- Media Grid -->
+      <div id="mediaGrid" class="media-grid"></div>
+    </div>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+<script>
+async function loadMedia() {
+  const folder = document.getElementById('folderFilter').value;
+  const data = await apiFetch(`/media?folder=${folder}`);
+  if (!data?.success) return;
+  const files = data.data;
+  document.getElementById('totalCount').textContent = `${files.length} files`;
+  const grid = document.getElementById('mediaGrid');
+  if (!files.length) { grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="icon">🗂️</div><p>No files uploaded yet</p></div>'; return; }
+  grid.innerHTML = files.map(f => {
+    const isImg = ['jpg','jpeg','png','gif','webp','svg'].includes(f.file_type||'');
+    return `<div class="media-item">
+      ${isImg
+        ? `<img class="media-thumb" src="${f.file_url}" alt="${f.original_name}" loading="lazy" />`
+        : `<div class="media-thumb pdf">📄</div>`}
+      <div class="media-info">
+        <div class="media-name" title="${f.original_name}">${f.original_name}</div>
+        <div class="media-size">${formatSize(f.file_size)} · ${f.folder}</div>
+        <div class="media-actions">
+          <button class="btn-icon btn-sm" onclick="copyUrl('${f.file_url}')" title="Copy URL">📋</button>
+          <a class="btn-icon btn-sm" href="${f.file_url}" target="_blank" title="Open">🔗</a>
+          <button class="btn-icon btn-sm" onclick="deleteFile(${f.id})" title="Delete" style="color:#ef4444">🗑️</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function uploadFiles(files) {
+  const progress = document.getElementById('uploadProgress');
+  for (const file of files) {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('folder', document.getElementById('folderFilter').value || 'general');
+    progress.innerHTML = `<div style="font-size:13px;color:#16a34a;font-weight:600">⏳ Uploading ${file.name}...</div>`;
+    const data = await apiFetch('/media', { method:'POST', body: fd });
+    if (data?.success) { toast(`✅ ${file.name} uploaded`); }
+    else toast(`Failed: ${file.name}`, 'error');
+  }
+  progress.innerHTML = '';
+  loadMedia();
+}
+
+async function deleteFile(id) {
+  if (!confirmDelete('Delete this file?')) return;
+  const data = await apiFetch(`/media/${id}`, { method:'DELETE' });
+  if (data?.success) { toast('File deleted'); loadMedia(); }
+  else toast(data?.message || 'Failed', 'error');
+}
+
+function copyUrl(url) {
+  navigator.clipboard.writeText(url).then(() => toast('URL copied!'));
+}
+
+function formatSize(bytes) {
+  if (!bytes) return '—';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/1048576).toFixed(1) + ' MB';
+}
+
+document.addEventListener('DOMContentLoaded', loadMedia);
+</script>
+</body>
+</html>

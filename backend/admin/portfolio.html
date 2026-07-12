@@ -36,29 +36,50 @@
     <div class="topbar">
       <div class="topbar-left"><button class="toggle-btn" id="sidebarToggle">☰</button><span class="page-title">Portfolio</span></div>
       <div class="topbar-right">
-        <button class="btn btn-primary btn-sm" onclick="openAdd()">+ Add Project</button>
+        <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Add Project</button>
         <button class="topbar-btn" onclick="logout()">🚪</button>
         <div class="topbar-user"><div class="topbar-avatar user-initials">A</div><span class="topbar-name user-name">Admin</span></div>
       </div>
     </div>
 
     <div class="page-body">
-      <div id="portfolioGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px">
-        <div style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8">Loading...</div>
+      <div class="filter-bar">
+        <div class="search-box"><span>🔍</span><input type="text" id="searchInput" placeholder="Search projects..." oninput="filterProjects()" /></div>
+        <select class="filter-select" id="catFilter" onchange="filterProjects()">
+          <option value="">All Categories</option>
+          <option value="Websites">Websites</option>
+          <option value="E-Commerce">E-Commerce</option>
+          <option value="Landing Pages">Landing Pages</option>
+          <option value="SEO Projects">SEO Projects</option>
+          <option value="Branding">Branding</option>
+        </select>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">All Projects</span><span id="totalCount" style="font-size:13px;color:#64748b"></span></div>
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Image</th><th>Title</th><th>Category</th><th>Industry</th><th>Featured</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="portfolioBody"><tr><td colspan="7"><div class="empty-state"><div class="icon">⏳</div><p>Loading...</p></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <!-- Add/Edit Modal -->
-<div class="modal-backdrop" id="formModal">
+<div class="modal-backdrop" id="editModal">
   <div class="modal modal-lg">
-    <div class="modal-header"><span class="modal-title" id="formTitle">Add Project</span><button class="modal-close" onclick="closeModal('formModal')">✕</button></div>
+    <div class="modal-header"><span class="modal-title" id="modalTitle">Add Project</span><button class="modal-close" onclick="closeModal('editModal')">✕</button></div>
     <div class="modal-body">
+      <input type="hidden" id="editId" />
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Title <span>*</span></label><input class="form-control" id="fTitle" placeholder="Project title" /></div>
+        <div class="form-group"><label class="form-label">Title <span>*</span></label><input class="form-control" id="f_title" placeholder="Project title" /></div>
         <div class="form-group"><label class="form-label">Category <span>*</span></label>
-          <select class="form-control" id="fCategory">
+          <select class="form-control" id="f_category">
             <option value="Websites">Websites</option><option value="E-Commerce">E-Commerce</option>
             <option value="Landing Pages">Landing Pages</option><option value="SEO Projects">SEO Projects</option>
             <option value="Branding">Branding</option>
@@ -66,129 +87,134 @@
         </div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Badge / Type</label><input class="form-control" id="fBadge" placeholder="e.g. Real Estate Website" /></div>
-        <div class="form-group"><label class="form-label">Industry</label><input class="form-control" id="fIndustry" placeholder="e.g. Healthcare" /></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Image URL</label><input class="form-control" id="fImage" placeholder="/p1.jpg or full URL" /></div>
-        <div class="form-group"><label class="form-label">Live Demo URL</label><input class="form-control" id="fLive" placeholder="https://..." /></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Client Name</label><input class="form-control" id="fClient" /></div>
-        <div class="form-group"><label class="form-label">Completion Date</label><input class="form-control" id="fDate" type="date" /></div>
+        <div class="form-group"><label class="form-label">Badge</label><input class="form-control" id="f_badge" placeholder="e.g. Real Estate Website" /></div>
+        <div class="form-group"><label class="form-label">Industry</label><input class="form-control" id="f_industry" placeholder="e.g. Healthcare" /></div>
       </div>
       <div class="form-row full">
-        <div class="form-group"><label class="form-label">Description</label><textarea class="form-control" id="fDesc" rows="3"></textarea></div>
+        <div class="form-group"><label class="form-label">Description</label><textarea class="form-control" id="f_description" rows="3"></textarea></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Features (comma separated)</label><input class="form-control" id="fFeatures" placeholder="Feature 1, Feature 2" /></div>
-        <div class="form-group"><label class="form-label">Technologies (comma separated)</label><input class="form-control" id="fTech" placeholder="React, PHP, MySQL" /></div>
+        <div class="form-group"><label class="form-label">Image URL</label><input class="form-control" id="f_image_url" placeholder="/p1.jpg or full URL" /></div>
+        <div class="form-group"><label class="form-label">Live URL</label><input class="form-control" id="f_live_url" placeholder="https://..." /></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Sort Order</label><input class="form-control" id="fSort" type="number" value="0" /></div>
-        <div class="form-group" style="flex-direction:row;align-items:center;gap:12px;padding-top:24px">
-          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" id="fFeatured" /> Featured Project</label>
-          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" id="fActive" checked /> Active</label>
+        <div class="form-group"><label class="form-label">Client Name</label><input class="form-control" id="f_client_name" /></div>
+        <div class="form-group"><label class="form-label">Completion Date</label><input class="form-control" id="f_completion_date" type="date" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Features (comma separated)</label><input class="form-control" id="f_features" placeholder="Feature 1, Feature 2" /></div>
+        <div class="form-group"><label class="form-label">Technologies (comma separated)</label><input class="form-control" id="f_tech" placeholder="React, PHP, MySQL" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Sort Order</label><input class="form-control" id="f_sort_order" type="number" value="0" /></div>
+        <div class="form-group" style="display:flex;gap:20px;align-items:flex-end;padding-bottom:4px">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;cursor:pointer"><input type="checkbox" id="f_is_featured" /> Featured</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;cursor:pointer"><input type="checkbox" id="f_is_active" checked /> Active</label>
         </div>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-primary" onclick="saveProject()">💾 Save Project</button>
-      <button class="btn btn-outline" onclick="closeModal('formModal')">Cancel</button>
+      <button class="btn btn-outline" onclick="closeModal('editModal')">Cancel</button>
     </div>
   </div>
 </div>
 
 <script src="admin.js"></script>
 <script>
-let editId = null;
+let allProjects = [];
 
 async function loadPortfolio() {
   const data = await apiFetch('/portfolio?all=1');
-  const grid = document.getElementById('portfolioGrid');
-  if (!data?.success) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#ef4444">Failed to load</div>'; return; }
-  const projects = data.data;
-  grid.innerHTML = projects.length
-    ? projects.map(p => `
-        <div class="card" style="overflow:hidden">
-          <div style="position:relative">
-            <img src="${p.image_url||''}" alt="${p.title}" style="width:100%;height:160px;object-fit:cover;background:#f1f5f9" onerror="this.style.background='#f1f5f9'" />
-            ${p.is_featured?'<span style="position:absolute;top:8px;left:8px;background:#f59e0b;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px">⭐ Featured</span>':''}
-            <span style="position:absolute;top:8px;right:8px;background:${p.is_active?'#22c55e':'#ef4444'};color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px">${p.is_active?'Active':'Inactive'}</span>
-          </div>
-          <div style="padding:14px">
-            <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;margin-bottom:4px">${p.category}</div>
-            <div style="font-size:15px;font-weight:700;margin-bottom:4px">${p.title}</div>
-            <div style="font-size:12px;color:#64748b;margin-bottom:12px">${p.badge||''}</div>
-            <div style="display:flex;gap:8px">
-              <button class="btn btn-outline btn-sm" onclick="editProject(${p.id})" style="flex:1">✏️ Edit</button>
-              <button class="btn btn-danger btn-sm" onclick="deleteProject(${p.id})">🗑️</button>
-            </div>
-          </div>
-        </div>`).join('')
-    : '<div style="grid-column:1/-1" class="empty-state"><div class="icon">🖼️</div><p>No projects yet. Add your first project!</p></div>';
-}
-
-function openAdd() {
-  editId = null;
-  document.getElementById('formTitle').textContent = 'Add Project';
-  ['fTitle','fBadge','fIndustry','fImage','fLive','fClient','fDesc','fFeatures','fTech'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('fCategory').value = 'Websites';
-  document.getElementById('fSort').value = '0';
-  document.getElementById('fDate').value = '';
-  document.getElementById('fFeatured').checked = false;
-  document.getElementById('fActive').checked = true;
-  openModal('formModal');
-}
-
-async function editProject(id) {
-  const data = await apiFetch(`/portfolio/${id}`);
   if (!data?.success) return;
-  const p = data.data;
-  editId = id;
-  document.getElementById('formTitle').textContent = 'Edit Project';
-  document.getElementById('fTitle').value    = p.title || '';
-  document.getElementById('fCategory').value = p.category || 'Websites';
-  document.getElementById('fBadge').value    = p.badge || '';
-  document.getElementById('fIndustry').value = p.industry || '';
-  document.getElementById('fImage').value    = p.image_url || '';
-  document.getElementById('fLive').value     = p.live_url || '';
-  document.getElementById('fClient').value   = p.client_name || '';
-  document.getElementById('fDate').value     = p.completion_date || '';
-  document.getElementById('fDesc').value     = p.description || '';
-  document.getElementById('fFeatures').value = (p.features||[]).join(', ');
-  document.getElementById('fTech').value     = (p.tech||[]).join(', ');
-  document.getElementById('fSort').value     = p.sort_order || 0;
-  document.getElementById('fFeatured').checked = !!p.is_featured;
-  document.getElementById('fActive').checked   = !!p.is_active;
-  openModal('formModal');
+  allProjects = data.data;
+  renderTable(allProjects);
+}
+
+function filterProjects() {
+  const q   = document.getElementById('searchInput').value.toLowerCase();
+  const cat = document.getElementById('catFilter').value;
+  const filtered = allProjects.filter(p =>
+    (!q || p.title.toLowerCase().includes(q) || (p.industry||'').toLowerCase().includes(q)) &&
+    (!cat || p.category === cat)
+  );
+  renderTable(filtered);
+}
+
+function renderTable(projects) {
+  document.getElementById('totalCount').textContent = `Total: ${projects.length}`;
+  const tbody = document.getElementById('portfolioBody');
+  tbody.innerHTML = projects.length
+    ? projects.map(p => `<tr>
+        <td><img src="${p.image_url||''}" style="width:60px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #e2e8f0" onerror="this.style.display='none'" /></td>
+        <td><strong>${p.title}</strong><br><small style="color:#64748b">${p.badge||''}</small></td>
+        <td><span class="badge badge-blue">${p.category}</span></td>
+        <td>${p.industry||'—'}</td>
+        <td>${p.is_featured ? '⭐' : '—'}</td>
+        <td>${p.is_active ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-gray">Inactive</span>'}</td>
+        <td style="display:flex;gap:6px">
+          <button class="btn-icon" onclick="editProject(${p.id})" title="Edit">✏️</button>
+          <button class="btn-icon" onclick="deleteProject(${p.id})" title="Delete" style="color:#ef4444">🗑️</button>
+        </td>
+      </tr>`).join('')
+    : '<tr><td colspan="7"><div class="empty-state"><div class="icon">🖼️</div><p>No projects found</p></div></td></tr>';
+}
+
+function openAddModal() {
+  document.getElementById('modalTitle').textContent = 'Add Project';
+  document.getElementById('editId').value = '';
+  ['f_title','f_badge','f_industry','f_description','f_image_url','f_live_url','f_client_name','f_features','f_tech'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f_sort_order').value = 0;
+  document.getElementById('f_is_featured').checked = false;
+  document.getElementById('f_is_active').checked = true;
+  openModal('editModal');
+}
+
+function editProject(id) {
+  const p = allProjects.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('modalTitle').textContent = 'Edit Project';
+  document.getElementById('editId').value = id;
+  document.getElementById('f_title').value = p.title || '';
+  document.getElementById('f_category').value = p.category || 'Websites';
+  document.getElementById('f_badge').value = p.badge || '';
+  document.getElementById('f_industry').value = p.industry || '';
+  document.getElementById('f_description').value = p.description || '';
+  document.getElementById('f_image_url').value = p.image_url || '';
+  document.getElementById('f_live_url').value = p.live_url || '';
+  document.getElementById('f_client_name').value = p.client_name || '';
+  document.getElementById('f_completion_date').value = p.completion_date || '';
+  document.getElementById('f_features').value = (p.features || []).join(', ');
+  document.getElementById('f_tech').value = (p.tech || []).join(', ');
+  document.getElementById('f_sort_order').value = p.sort_order || 0;
+  document.getElementById('f_is_featured').checked = !!p.is_featured;
+  document.getElementById('f_is_active').checked = !!p.is_active;
+  openModal('editModal');
 }
 
 async function saveProject() {
-  const title    = document.getElementById('fTitle').value.trim();
-  const category = document.getElementById('fCategory').value;
-  if (!title) { toast('Title is required', 'error'); return; }
-
+  const id = document.getElementById('editId').value;
   const payload = {
-    title, category,
-    badge:       document.getElementById('fBadge').value.trim(),
-    industry:    document.getElementById('fIndustry').value.trim(),
-    image_url:   document.getElementById('fImage').value.trim(),
-    live_url:    document.getElementById('fLive').value.trim(),
-    client_name: document.getElementById('fClient').value.trim(),
-    completion_date: document.getElementById('fDate').value,
-    description: document.getElementById('fDesc').value.trim(),
-    features:    document.getElementById('fFeatures').value.split(',').map(s=>s.trim()).filter(Boolean),
-    tech:        document.getElementById('fTech').value.split(',').map(s=>s.trim()).filter(Boolean),
-    sort_order:  parseInt(document.getElementById('fSort').value)||0,
-    is_featured: document.getElementById('fFeatured').checked ? 1 : 0,
-    is_active:   document.getElementById('fActive').checked ? 1 : 0,
+    title:       document.getElementById('f_title').value.trim(),
+    category:    document.getElementById('f_category').value,
+    badge:       document.getElementById('f_badge').value.trim(),
+    industry:    document.getElementById('f_industry').value.trim(),
+    description: document.getElementById('f_description').value.trim(),
+    image_url:   document.getElementById('f_image_url').value.trim(),
+    live_url:    document.getElementById('f_live_url').value.trim(),
+    client_name: document.getElementById('f_client_name').value.trim(),
+    completion_date: document.getElementById('f_completion_date').value,
+    features:    document.getElementById('f_features').value.split(',').map(s=>s.trim()).filter(Boolean),
+    tech:        document.getElementById('f_tech').value.split(',').map(s=>s.trim()).filter(Boolean),
+    sort_order:  parseInt(document.getElementById('f_sort_order').value) || 0,
+    is_featured: document.getElementById('f_is_featured').checked ? 1 : 0,
+    is_active:   document.getElementById('f_is_active').checked ? 1 : 0,
   };
-
-  const url    = editId ? `/portfolio/${editId}` : '/portfolio';
-  const method = editId ? 'PUT' : 'POST';
-  const data   = await apiFetch(url, { method, body: JSON.stringify(payload) });
-  if (data?.success) { toast(editId ? 'Project updated!' : 'Project added!'); closeModal('formModal'); loadPortfolio(); }
+  if (!payload.title || !payload.category) { toast('Title and category are required', 'error'); return; }
+  const endpoint = id ? `/portfolio/${id}` : '/portfolio';
+  const method   = id ? 'PUT' : 'POST';
+  const data = await apiFetch(endpoint, { method, body: JSON.stringify(payload) });
+  if (data?.success) { toast(id ? 'Project updated!' : 'Project created!'); closeModal('editModal'); loadPortfolio(); }
   else toast(data?.message || 'Failed', 'error');
 }
 

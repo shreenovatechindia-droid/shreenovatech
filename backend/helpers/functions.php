@@ -73,6 +73,64 @@ function paginate(int $total, int $page, int $perPage): array {
     ];
 }
 
+// ── Send Email (SMTP via site_settings) ─────────────────
+function sendMail(string $to, string $toName, string $subject, string $htmlBody): bool {
+    $db   = getDB();
+    $rows = $db->query("SELECT setting_key, setting_value FROM site_settings WHERE setting_group = 'smtp'")
+               ->fetch_all(MYSQLI_ASSOC);
+    $cfg  = [];
+    foreach ($rows as $r) $cfg[$r['setting_key']] = $r['setting_value'];
+
+    $host     = $cfg['smtp_host']      ?? 'smtp.gmail.com';
+    $port     = (int)($cfg['smtp_port'] ?? 587);
+    $user     = $cfg['smtp_user']      ?? '';
+    $pass     = $cfg['smtp_pass']      ?? '';
+    $fromName = $cfg['smtp_from_name'] ?? 'ShreeNova Tech';
+
+    if (!$user || !$pass) return false; // SMTP not configured
+
+    // Native SMTP socket send
+    $errno = 0; $errstr = '';
+    $sock = fsockopen("ssl://$host", $port === 465 ? 465 : $port, $errno, $errstr, 10);
+    if (!$sock) {
+        // Fallback: try TLS on 587
+        $sock = fsockopen($host, $port, $errno, $errstr, 10);
+        if (!$sock) return false;
+    }
+
+    $read = fn() => fgets($sock, 515);
+    $send = function(string $cmd) use ($sock, $read) {
+        fputs($sock, $cmd . "\r\n");
+        return $read();
+    };
+
+    $read(); // 220 greeting
+    $send("EHLO localhost");
+    if ($port !== 465) {
+        $send("STARTTLS");
+        stream_socket_enable_crypto($sock, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+        $send("EHLO localhost");
+    }
+    $send("AUTH LOGIN");
+    $send(base64_encode($user));
+    $send(base64_encode($pass));
+    $send("MAIL FROM:<$user>");
+    $send("RCPT TO:<$to>");
+    $send("DATA");
+
+    $boundary = md5(uniqid());
+    $msg  = "From: \"$fromName\" <$user>\r\n";
+    $msg .= "To: \"$toName\" <$to>\r\n";
+    $msg .= "Subject: $subject\r\n";
+    $msg .= "MIME-Version: 1.0\r\n";
+    $msg .= "Content-Type: text/html; charset=UTF-8\r\n";
+    $msg .= "\r\n$htmlBody\r\n.";
+    $send($msg);
+    $send("QUIT");
+    fclose($sock);
+    return true;
+}
+
 // ── Simple rate limiter (file-based) ─────────────────────
 function rateLimit(string $key, int $max = 10, int $window = 60): void {
     $file = sys_get_temp_dir() . '/snt_rl_' . md5($key) . '.json';

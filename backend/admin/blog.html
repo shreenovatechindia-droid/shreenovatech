@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Blog – ShreeNova Tech Admin</title>
+<link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><img src="../../public/logo.png" alt="SNT" onerror="this.style.display='none'" /><span>ShreeNova Tech</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a class="nav-item" data-page="dashboard.html" href="dashboard.html"><span class="icon">📊</span><span>Dashboard</span></a>
+      <div class="nav-section">Management</div>
+      <a class="nav-item" data-page="bookings.html"  href="bookings.html"><span class="icon">📋</span><span>Bookings</span></a>
+      <a class="nav-item" data-page="payments.html"  href="payments.html"><span class="icon">💳</span><span>Payments</span></a>
+      <a class="nav-item" data-page="contacts.html"  href="contacts.html"><span class="icon">✉️</span><span>Contacts</span></a>
+      <div class="nav-section">Website</div>
+      <a class="nav-item" data-page="portfolio.html"    href="portfolio.html"><span class="icon">🖼️</span><span>Portfolio</span></a>
+      <a class="nav-item" data-page="pricing.html"      href="pricing.html"><span class="icon">💰</span><span>Pricing</span></a>
+      <a class="nav-item" data-page="testimonials.html" href="testimonials.html"><span class="icon">⭐</span><span>Testimonials</span></a>
+      <a class="nav-item" data-page="faqs.html"         href="faqs.html"><span class="icon">❓</span><span>FAQs</span></a>
+      <a class="nav-item" data-page="hosting.html"      href="hosting.html"><span class="icon">🌐</span><span>Hosting Plans</span></a>
+      <a class="nav-item" data-page="blog.html"         href="blog.html"><span class="icon">📝</span><span>Blog</span></a>
+      <div class="nav-section">System</div>
+      <a class="nav-item" data-page="media.html"    href="media.html"><span class="icon">🗂️</span><span>Media Manager</span></a>
+      <a class="nav-item" data-page="seo.html"      href="seo.html"><span class="icon">🔍</span><span>SEO Settings</span></a>
+      <a class="nav-item" data-page="users.html"    href="users.html"><span class="icon">👥</span><span>Users</span></a>
+      <a class="nav-item" data-page="settings.html" href="settings.html"><span class="icon">⚙️</span><span>Settings</span></a>
+    </nav>
+    <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-avatar user-initials">A</div><div class="sidebar-user-info"><strong class="user-name">Admin</strong><small class="user-role">super_admin</small></div></div></div>
+  </aside>
+
+  <div class="main-content" id="mainContent">
+    <div class="topbar">
+      <div class="topbar-left"><button class="toggle-btn" id="sidebarToggle">☰</button><span class="page-title">Blog Posts</span></div>
+      <div class="topbar-right">
+        <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ New Post</button>
+        <button class="topbar-btn" onclick="logout()">🚪</button>
+        <div class="topbar-user"><div class="topbar-avatar user-initials">A</div><span class="topbar-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="filter-bar">
+        <div class="search-box"><span>🔍</span><input type="text" id="searchInput" placeholder="Search posts..." oninput="debounceLoad()" /></div>
+        <select class="filter-select" id="statusFilter" onchange="loadBlogs(1)">
+          <option value="all">All Status</option>
+          <option value="published">Published</option>
+          <option value="draft">Draft</option>
+          <option value="archived">Archived</option>
+        </select>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">All Posts</span><span id="totalCount" style="font-size:13px;color:#64748b"></span></div>
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Title</th><th>Category</th><th>Author</th><th>Views</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+              <tbody id="blogBody"><tr><td colspan="7"><div class="empty-state"><div class="icon">⏳</div><p>Loading...</p></div></td></tr></tbody>
+            </table>
+          </div>
+          <div class="pagination" id="pagination"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-backdrop" id="editModal">
+  <div class="modal modal-lg">
+    <div class="modal-header"><span class="modal-title" id="modalTitle">New Post</span><button class="modal-close" onclick="closeModal('editModal')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="editId" />
+      <div class="form-row full">
+        <div class="form-group"><label class="form-label">Title <span>*</span></label><input class="form-control" id="f_title" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Category ID</label><input class="form-control" id="f_category_id" type="number" placeholder="1=WebDev, 2=DigMkt..." /></div>
+        <div class="form-group"><label class="form-label">Status</label>
+          <select class="form-control" id="f_status">
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+            <option value="archived">Archived</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group"><label class="form-label">Excerpt</label><textarea class="form-control" id="f_excerpt" rows="2"></textarea></div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group"><label class="form-label">Content</label><textarea class="form-control" id="f_content" rows="10" placeholder="Write your blog post content here..."></textarea></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Image URL</label><input class="form-control" id="f_image_url" /></div>
+        <div class="form-group"><label class="form-label">Tags (comma separated)</label><input class="form-control" id="f_tags" /></div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group"><label class="form-label">Meta Title</label><input class="form-control" id="f_meta_title" /></div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group"><label class="form-label">Meta Description</label><textarea class="form-control" id="f_meta_desc" rows="2"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="savePost()">💾 Save Post</button>
+      <button class="btn btn-outline" onclick="closeModal('editModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+<script>
+let currentPage = 1, debounceTimer;
+function debounceLoad() { clearTimeout(debounceTimer); debounceTimer = setTimeout(() => loadBlogs(1), 400); }
+
+async function loadBlogs(page = 1) {
+  currentPage = page;
+  const status = document.getElementById('statusFilter').value;
+  const params = new URLSearchParams({ page, limit:20, status });
+  const data = await apiFetch(`/blog?${params}`);
+  const tbody = document.getElementById('blogBody');
+  if (!data?.success) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><p>Failed to load</p></div></td></tr>'; return; }
+  const { posts, pagination } = data.data;
+  document.getElementById('totalCount').textContent = `Total: ${pagination.total}`;
+  tbody.innerHTML = posts.length
+    ? posts.map(p => `<tr>
+        <td><strong>${p.title}</strong><br><small style="color:#64748b;font-size:11px">${p.slug}</small></td>
+        <td>${p.category_name||'—'}</td>
+        <td>${p.author_name||'—'}</td>
+        <td>${p.views||0}</td>
+        <td>${statusBadge(p.status)}</td>
+        <td>${fmtDate(p.created_at)}</td>
+        <td style="display:flex;gap:6px">
+          <button class="btn-icon" onclick="editPost(${p.id})" title="Edit">✏️</button>
+          <button class="btn-icon" onclick="deletePost(${p.id})" title="Delete" style="color:#ef4444">🗑️</button>
+        </td>
+      </tr>`).join('')
+    : '<tr><td colspan="7"><div class="empty-state"><div class="icon">📝</div><p>No posts found</p></div></td></tr>';
+  renderPagination('pagination', pagination, 'loadBlogs');
+}
+
+function openAddModal() {
+  document.getElementById('modalTitle').textContent = 'New Post';
+  document.getElementById('editId').value = '';
+  ['f_title','f_excerpt','f_content','f_image_url','f_tags','f_meta_title','f_meta_desc'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f_category_id').value = '';
+  document.getElementById('f_status').value = 'draft';
+  openModal('editModal');
+}
+
+async function editPost(id) {
+  const data = await apiFetch(`/blog/${id}`);
+  if (!data?.success) return;
+  const p = data.data;
+  document.getElementById('modalTitle').textContent = 'Edit Post';
+  document.getElementById('editId').value = id;
+  document.getElementById('f_title').value = p.title || '';
+  document.getElementById('f_category_id').value = p.category_id || '';
+  document.getElementById('f_status').value = p.status || 'draft';
+  document.getElementById('f_excerpt').value = p.excerpt || '';
+  document.getElementById('f_content').value = p.content || '';
+  document.getElementById('f_image_url').value = p.image_url || '';
+  document.getElementById('f_tags').value = (p.tags||[]).join(', ');
+  document.getElementById('f_meta_title').value = p.meta_title || '';
+  document.getElementById('f_meta_desc').value = p.meta_desc || '';
+  openModal('editModal');
+}
+
+async function savePost() {
+  const id = document.getElementById('editId').value;
+  const payload = {
+    title:       document.getElementById('f_title').value.trim(),
+    category_id: parseInt(document.getElementById('f_category_id').value) || null,
+    status:      document.getElementById('f_status').value,
+    excerpt:     document.getElementById('f_excerpt').value.trim(),
+    content:     document.getElementById('f_content').value,
+    image_url:   document.getElementById('f_image_url').value.trim(),
+    tags:        document.getElementById('f_tags').value.split(',').map(s=>s.trim()).filter(Boolean),
+    meta_title:  document.getElementById('f_meta_title').value.trim(),
+    meta_desc:   document.getElementById('f_meta_desc').value.trim(),
+  };
+  if (!payload.title) { toast('Title is required', 'error'); return; }
+  const endpoint = id ? `/blog/${id}` : '/blog';
+  const method   = id ? 'PUT' : 'POST';
+  const data = await apiFetch(endpoint, { method, body: JSON.stringify(payload) });
+  if (data?.success) { toast(id ? 'Post updated!' : 'Post created!'); closeModal('editModal'); loadBlogs(currentPage); }
+  else toast(data?.message || 'Failed', 'error');
+}
+
+async function deletePost(id) {
+  if (!confirmDelete('Delete this post?')) return;
+  const data = await apiFetch(`/blog/${id}`, { method:'DELETE' });
+  if (data?.success) { toast('Post deleted'); loadBlogs(currentPage); }
+  else toast(data?.message || 'Failed', 'error');
+}
+
+document.addEventListener('DOMContentLoaded', () => loadBlogs(1));
+</script>
+</body>
+</html>

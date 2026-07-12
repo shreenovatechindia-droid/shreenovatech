@@ -386,6 +386,8 @@
   .sp-two-col  { grid-template-columns: 1fr; gap: 32px; }
   .sp-hero h1  { font-size: 34px; }
   .sp-process  { grid-template-columns: repeat(2, 1fr); }
+  .sp-hero-stats { gap: 24px; }
+  .sp-hero-stat strong { font-size: 22px; }
 }
 @media (max-width: 576px) {
   .sp-hero     { padding: 60px 0 50px; }
@@ -398,5 +400,16 @@
   .sp-cta      { padding: 40px 24px; margin: 0 12px; }
   .sp-cta h2   { font-size: 24px; }
   .sp-process  { grid-template-columns: 1fr 1fr; }
-  .sp-hero-stats { gap: 24px; }
+  .sp-hero-stats { gap: 16px; flex-wrap: wrap; }
+  .sp-hero-btns { flex-direction: column; }
+  .sp-hero-btns a, .sp-hero-btns button { width: 100%; justify-content: center; }
+  .sp-cta-btns { flex-direction: column; align-items: center; }
+  .sp-cta-btns a, .sp-cta-btns button { width: 100%; justify-content: center; }
+  .sp-two-col-img { height: 240px; font-size: 60px; }
+  .sp-pricing-grid { max-width: 100%; }
+}
+@media (max-width: 425px) {
+  .sp-hero h1  { font-size: 22px; }
+  .sp-process  { grid-template-columns: 1fr; }
+  .sp-section-head h2 { font-size: 22px; }
 }

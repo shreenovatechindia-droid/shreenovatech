@@ -27,7 +27,9 @@ export const getHosting      = (type='') => api.get('/hosting' + (type ? `?type=
 
 // ── Submit forms ─────────────────────────────────────────────
 export const submitContact   = (data)   => api.post('/contact', data);
-export const submitBooking   = (data)   => api.post('/bookings', data);
+export const submitBooking   = (data)   => api.post('/bookings', data, {
+  headers: data instanceof FormData ? { 'Content-Type': 'multipart/form-data' } : {},
+});
 export const submitPayment   = (data)   => api.post('/payments', data, { headers: { 'Content-Type': 'multipart/form-data' } });
 export const subscribeNewsletter = (email) => api.post('/newsletter', { email });
 export const trackVisit      = (page)   => api.post('/track', { page, referrer: document.referrer });
