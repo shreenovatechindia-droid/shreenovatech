@@ -173,7 +173,7 @@ img, video, iframe, embed, object {
    STATS SECTION
    ============================================= */
 @media (max-width: 1024px) {
-  .stats-grid { padding: 28px 24px; }
+  .stats-grid { padding: 28px 20px; }
   .stat-num { font-size: 38px; }
   .stat-label { font-size: 18px; }
 }

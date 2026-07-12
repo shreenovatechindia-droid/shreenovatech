@@ -637,10 +637,11 @@
   padding: 80px 0 60px;
 }
 .help-container {
-  max-width: 1200px;
+  max-width: 1320px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 20px;
   text-align: center;
+  box-sizing: border-box;
 }
 .help-heading {
   font-size: 54px;
@@ -723,9 +724,12 @@
 }
 .stats-grid {
   width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  padding: 16px 40px;
+  padding: 16px 20px;
+  box-sizing: border-box;
 }
 .stat-col {
   text-align: center;
