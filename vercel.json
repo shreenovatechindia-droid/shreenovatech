@@ -10,6 +10,14 @@
       "maxDuration": 30
     }
   },
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "www.shreenovatech.in" }],
+      "destination": "https://shreenovatech.in/$1",
+      "permanent": true
+    }
+  ],
   "routes": [
     {
       "src": "/api/(.*)",
