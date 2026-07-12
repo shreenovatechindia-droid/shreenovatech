@@ -15,7 +15,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: '../backend/admin-react',
+    outDir: '../dist/admin',
     emptyOutDir: true,
   },
 });

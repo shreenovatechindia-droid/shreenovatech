@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && cd admin-panel && npm install && npm run build",
+    "build:main": "vite build",
+    "build:admin": "cd admin-panel && npm install && npm run build",
     "lint": "oxlint",
     "preview": "vite preview"
   },
