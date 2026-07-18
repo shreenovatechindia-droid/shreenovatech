@@ -2,13 +2,17 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { useEffect } from 'react';
 import { trackPageView } from './analytics.js';
 
-// Redirect /admin to the React admin panel
-function AdminRedirect() {
-  useEffect(() => {
-    window.location.href = '/admin/';
-  }, []);
-  return null;
-}
+// Admin Panel
+import AdminLayout    from './pages/admin/AdminLayout';
+import AdminLogin     from './pages/admin/AdminLogin';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminBookings  from './pages/admin/AdminBookings';
+import AdminPayments  from './pages/admin/AdminPayments';
+import AdminContacts  from './pages/admin/AdminContacts';
+import AdminPortfolio from './pages/admin/AdminPortfolio';
+import AdminPricing   from './pages/admin/AdminPricing';
+import AdminSettings  from './pages/admin/AdminSettings';
+import { ToastProvider } from './pages/admin/Toast';
 import Home from './pages/Home';
 import PaymentPage from './pages/PaymentPage';
 import BookingPage from './pages/BookingPage';
@@ -45,6 +49,7 @@ function GATracker() {
 export default function App() {
   return (
     <BrowserRouter>
+      <ToastProvider />
       <GATracker />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -79,8 +84,17 @@ export default function App() {
         <Route path="/about" element={<AboutPage />} />
 
         {/* Admin Panel */}
-        <Route path="/admin" element={<AdminRedirect />} />
-        <Route path="/admin/*" element={<AdminRedirect />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Navigate to="/admin/dashboard" replace />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="bookings"  element={<AdminBookings />} />
+          <Route path="payments"  element={<AdminPayments />} />
+          <Route path="contacts"  element={<AdminContacts />} />
+          <Route path="portfolio" element={<AdminPortfolio />} />
+          <Route path="pricing"   element={<AdminPricing />} />
+          <Route path="settings"  element={<AdminSettings />} />
+        </Route>
 
         {/* Hash-section redirects */}
         <Route path="/portfolio" element={<Navigate to="/#portfolio" replace />} />

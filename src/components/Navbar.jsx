@@ -50,6 +50,10 @@ function HashLink({ item, className, style, onClick, children }) {
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(null);
+
+  const toggleDropdown = (label) =>
+    setOpenDropdown(prev => prev === label ? null : label);
 
   return (
     <>
@@ -112,20 +116,43 @@ export default function Navbar() {
 
         <div className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
           {navItems.map(item => (
-            <span key={item.label}>
-              {item.hash ? (
-                <HashLink item={item} onClick={() => setMenuOpen(false)}>{item.label}</HashLink>
+            <div key={item.label} className="mob-nav-group">
+              {item.children ? (
+                <button
+                  className="mob-nav-parent"
+                  onClick={() => toggleDropdown(item.label)}
+                >
+                  <span>{item.label}</span>
+                  <FiChevronDown
+                    size={16}
+                    className={`mob-chevron ${openDropdown === item.label ? 'open' : ''}`}
+                  />
+                </button>
+              ) : item.hash ? (
+                <HashLink item={item} className="mob-nav-parent" onClick={() => setMenuOpen(false)}>
+                  <span>{item.label}</span>
+                </HashLink>
               ) : (
-                <Link to={item.path} onClick={() => setMenuOpen(false)}>{item.label}</Link>
+                <Link to={item.path} className="mob-nav-parent" onClick={() => setMenuOpen(false)}>
+                  <span>{item.label}</span>
+                </Link>
               )}
-              {item.children && item.children.map(c => (
-                <Link key={c.label} to={c.path} onClick={() => setMenuOpen(false)} style={{ paddingLeft:28, fontSize:13, opacity:0.85 }}>{c.label}</Link>
-              ))}
-            </span>
+              {item.children && openDropdown === item.label && (
+                <div className="mob-nav-children">
+                  {item.children.map(c => (
+                    <Link key={c.label} to={c.path} className="mob-nav-child" onClick={() => { setMenuOpen(false); setOpenDropdown(null); }}>
+                      {c.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
-          <Link to="/book-now" className="btn-orange mt-3 d-inline-flex" onClick={() => setMenuOpen(false)}>
-            <FiSend size={14} /> Get Started
-          </Link>
+          <div className="mob-nav-footer">
+            <Link to="/about" className="btn-orange mob-about-btn" onClick={() => setMenuOpen(false)}>
+              <FiSend size={14} /> About Us
+            </Link>
+          </div>
         </div>
       </nav>
     </>
