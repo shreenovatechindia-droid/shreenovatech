@@ -22,8 +22,8 @@ exports.index = async (req, res) => {
     `SELECT * FROM bookings ${whereSQL} ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`, params
   );
 
-  rows.forEach(r => { try { r.services = JSON.parse(r.services || '[]'); } catch { r.services = []; } });
-  ok(res, { bookings: rows, pagination: paginate(total, page, limit) });
+  rows.forEach(r => { try { r.services = typeof r.services === 'string' ? JSON.parse(r.services || '[]') : (r.services || []); } catch { r.services = []; } });
+  ok(res, { bookings: rows, pagination: paginate(Number(total), page, limit) });
 };
 
 exports.show = async (req, res) => {

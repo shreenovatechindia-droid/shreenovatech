@@ -27,7 +27,7 @@ exports.index = async (req, res) => {
   const [rows] = await db.execute(
     `SELECT * FROM payments ${whereSQL} ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`, params
   );
-  ok(res, { payments: rows, pagination: paginate(total, page, limit) });
+  ok(res, { payments: rows, pagination: paginate(Number(total), page, limit) });
 };
 
 exports.show = async (req, res) => {

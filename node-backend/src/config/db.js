@@ -1,36 +1,20 @@
-const mysql = require('mysql2/promise');
+const { Pool } = require('pg');
 require('dotenv').config();
 
-let poolConfig;
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+});
 
-if (process.env.DATABASE_URL) {
-  // Aiven / Railway DATABASE_URL format
-  poolConfig = {
-    uri: process.env.DATABASE_URL,
-    waitForConnections: true,
-    connectionLimit: 10,
-    charset: 'utf8mb4',
-    ssl: { rejectUnauthorized: false },
-  };
-} else {
-  poolConfig = {
-    host:               process.env.DB_HOST     || 'localhost',
-    port:               parseInt(process.env.DB_PORT) || 3306,
-    user:               process.env.DB_USER     || 'root',
-    password:           process.env.DB_PASS     || '',
-    database:           process.env.DB_NAME     || 'shreenovatech_db',
-    waitForConnections: true,
-    connectionLimit:    10,
-    charset:            'utf8mb4',
-    ...(process.env.DB_SSL === 'true' && { ssl: { rejectUnauthorized: false } }),
-  };
-}
+// MySQL-compatible wrapper: converts ? placeholders to $1,$2,... and returns [rows] format
+pool.execute = async (sql, params = []) => {
+  let i = 0;
+  const pgSql = sql.replace(/\?/g, () => `$${++i}`);
+  const result = await pool.query(pgSql, params);
+  return [result.rows, result.fields];
+};
 
-const pool = mysql.createPool(poolConfig);
-
-// Test connection on startup
-pool.getConnection()
-  .then(conn => { console.log('✅ MySQL connected'); conn.release(); })
-  .catch(err => console.error('❌ MySQL connection failed:', err.message));
+pool.on('connect', () => console.log('✅ PostgreSQL connected'));
+pool.on('error', (err) => console.error('❌ PostgreSQL error:', err.message));
 
 module.exports = pool;

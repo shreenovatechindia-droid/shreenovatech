@@ -12,7 +12,7 @@ exports.index = async (req, res) => {
     new_contacts:     "SELECT COUNT(*) as v FROM contacts WHERE status = 'new'",
     total_portfolio:  'SELECT COUNT(*) as v FROM portfolio WHERE is_active = 1',
     subscribers:      'SELECT COUNT(*) as v FROM newsletter_subscribers WHERE is_active = 1',
-    today_visitors:   'SELECT COUNT(*) as v FROM visitors WHERE visit_date = CURDATE()',
+    today_visitors:   'SELECT COUNT(*) as v FROM visitors WHERE visit_date = CURRENT_DATE',
     total_visitors:   'SELECT COUNT(*) as v FROM visitors',
   };
 
@@ -28,21 +28,21 @@ exports.index = async (req, res) => {
   counts.total_revenue = parseFloat(rev.total);
 
   const [monthly_bookings] = await db.execute(`
-    SELECT DATE_FORMAT(created_at,'%b %Y') as month,
+    SELECT TO_CHAR(created_at,'Mon YYYY') as month,
            COUNT(*) as bookings,
            SUM(CASE WHEN status='completed' THEN 1 ELSE 0 END) as completed
     FROM bookings
-    WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
-    GROUP BY DATE_FORMAT(created_at,'%Y-%m')
+    WHERE created_at >= NOW() - INTERVAL '6 months'
+    GROUP BY TO_CHAR(created_at,'Mon YYYY'), TO_CHAR(created_at,'YYYY-MM')
     ORDER BY MIN(created_at)
   `);
 
   const [monthly_revenue] = await db.execute(`
-    SELECT DATE_FORMAT(created_at,'%b %Y') as month,
+    SELECT TO_CHAR(created_at,'Mon YYYY') as month,
            COALESCE(SUM(total_amount),0) as amount
     FROM payments
-    WHERE status = 'verified' AND created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
-    GROUP BY DATE_FORMAT(created_at,'%Y-%m')
+    WHERE status = 'verified' AND created_at >= NOW() - INTERVAL '6 months'
+    GROUP BY TO_CHAR(created_at,'Mon YYYY'), TO_CHAR(created_at,'YYYY-MM')
     ORDER BY MIN(created_at)
   `);
 
