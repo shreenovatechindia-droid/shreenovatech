@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: shreenovatech-api
+    runtime: node
+    rootDir: node-backend
+    buildCommand: npm install
+    startCommand: npm start
+    plan: free
+    region: singapore
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: JWT_EXPIRES_IN
+        value: 24h
