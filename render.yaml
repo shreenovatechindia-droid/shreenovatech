@@ -3,8 +3,8 @@ services:
     name: shreenovatech-api
     runtime: node
     rootDir: node-backend
-    buildCommand: npm install
-    startCommand: npm start
+    buildCommand: npm install --production
+    startCommand: node src/server.js
     plan: free
     region: singapore
     envVars:
