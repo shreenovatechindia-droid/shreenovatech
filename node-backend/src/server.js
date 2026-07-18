@@ -7,6 +7,9 @@ const rateLimit = require('express-rate-limit');
 
 const app = express();
 
+// ── Trust Proxy (Render/Vercel) ──────────────────────────────
+app.set('trust proxy', 1);
+
 // ── Security ──────────────────────────────────────────────────
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 
