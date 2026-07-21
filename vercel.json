@@ -6,29 +6,22 @@
   "framework": null,
   "routes": [
     {
-      "src": "/(.*)",
-      "has": [{ "type": "host", "value": "shreenovatech.in" }],
-      "headers": { "Location": "https://www.shreenovatech.in/$1" },
-      "status": 301,
-      "dest": "/$1"
-    },
-    {
-      "src": "/api/(.*)",
+      "src": "^/api/(.*)",
       "dest": "https://shreenovatech.onrender.com/api/$1"
     },
     {
-      "src": "/admin/assets/(.*)",
+      "src": "^/admin/assets/(.*)",
       "dest": "/admin/assets/$1"
     },
     {
-      "src": "/admin(.*)",
+      "src": "^/admin(.*)",
       "dest": "/admin/index.html"
     },
     {
       "handle": "filesystem"
     },
     {
-      "src": "/(.*)",
+      "src": "^/(.*)",
       "dest": "/index.html"
     }
   ]

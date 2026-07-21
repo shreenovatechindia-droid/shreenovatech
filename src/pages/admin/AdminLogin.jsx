@@ -64,7 +64,7 @@ export default function AdminLogin() {
         </form>
 
         <div style={{ textAlign:'center', marginTop:'18px', fontSize:'12px', color:'#94a3b8' }}>
-          Default: admin@shreenovatech.in / password
+          &copy; {new Date().getFullYear()} ShreeNova Tech. All rights reserved.
         </div>
       </div>
     </div>

@@ -1,5 +1,8 @@
-const { Payment } = require('../models');
+const { Payment }                              = require('../models');
 const { ok, err, paginate, genRef, logActivity } = require('../middleware/helpers');
+const { sendApprovalEmail, sendRejectionEmail }  = require('../services/emailService');
+const { sendApprovalWhatsApp, sendRejectionWhatsApp } = require('../services/whatsappService');
+const { paymentApprovedNotif, paymentRejectedNotif, newPaymentNotif } = require('../services/notificationService');
 
 const PKG_MAP = {
   silver:  ['Silver Package',  9999],
@@ -48,7 +51,7 @@ exports.store = async (req, res) => {
   const refId   = genRef('PAY');
   const ssUrl   = req.file ? `${process.env.BASE_URL}/uploads/payments/${req.file.filename}` : '';
 
-  await Payment.create({
+  const payment = await Payment.create({
     ref_id: refId, full_name: fullName, mobile, whatsapp: whatsapp||'', email,
     company: company||'', gst: gst||'', address: address||'',
     city: city||'', state: state||'', country, pincode: pincode||'',
@@ -56,18 +59,87 @@ exports.store = async (req, res) => {
     amount, gst_amount: gstAmt, total_amount: total,
     pay_method: payMethod, transaction_id: transaction_id||'', screenshot_url: ssUrl,
   });
+
+  // Notify admin — new payment received
+  await newPaymentNotif(payment).catch(() => {});
+
   ok(res, { ref_id: refId }, 'Payment submitted successfully', 201);
 };
 
 exports.updateStatus = async (req, res) => {
   const { status, admin_notes } = req.body;
-  if (!['pending','verified','rejected'].includes(status)) return err(res, 'Invalid status.');
+  if (!['pending','verified','rejected','approved'].includes(status)) return err(res, 'Invalid status.');
   await Payment.findByIdAndUpdate(req.params.id, {
     status, admin_notes: admin_notes||'',
     verified_by: req.user.id, verified_at: new Date(),
   });
   await logActivity(req.user.id, `payment_${status}`, 'payments', req.params.id);
   ok(res, null, 'Payment status updated');
+};
+
+// ── Approve Payment ───────────────────────────────────────────
+exports.approvePayment = async (req, res) => {
+  const payment = await Payment.findById(req.params.id);
+  if (!payment) return err(res, 'Payment not found', 404);
+  if (payment.status === 'approved') return err(res, 'Payment already approved.');
+
+  const ip      = req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress || '';
+  const browser = req.headers['user-agent'] || '';
+
+  await Payment.findByIdAndUpdate(req.params.id, {
+    status:              'approved',
+    payment_verified:    true,
+    approved_at:         new Date(),
+    verified_by:         req.user.id,
+    verified_at:         new Date(),
+    approved_by_ip:      ip,
+    approved_by_browser: browser,
+    admin_notes:         req.body.admin_notes || payment.admin_notes || '',
+  });
+
+  const updated = await Payment.findById(req.params.id);
+
+  // Fire all notifications — don't block response on failure
+  await Promise.allSettled([
+    sendApprovalEmail(updated),
+    sendApprovalWhatsApp(updated),
+    paymentApprovedNotif(updated),
+    logActivity(req.user.id, 'payment_approved', 'payments', req.params.id,
+      `IP:${ip} | Browser:${browser.slice(0,80)}`),
+  ]);
+
+  ok(res, null, 'Payment approved. Email & WhatsApp sent to customer.');
+};
+
+// ── Reject Payment ────────────────────────────────────────────
+exports.rejectPayment = async (req, res) => {
+  const payment = await Payment.findById(req.params.id);
+  if (!payment) return err(res, 'Payment not found', 404);
+
+  const ip      = req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress || '';
+  const browser = req.headers['user-agent'] || '';
+
+  await Payment.findByIdAndUpdate(req.params.id, {
+    status:              'rejected',
+    payment_verified:    false,
+    verified_by:         req.user.id,
+    verified_at:         new Date(),
+    approved_by_ip:      ip,
+    approved_by_browser: browser,
+    admin_notes:         req.body.admin_notes || payment.admin_notes || '',
+  });
+
+  const updated = await Payment.findById(req.params.id);
+
+  await Promise.allSettled([
+    sendRejectionEmail(updated),
+    sendRejectionWhatsApp(updated),
+    paymentRejectedNotif(updated),
+    logActivity(req.user.id, 'payment_rejected', 'payments', req.params.id,
+      `IP:${ip} | Browser:${browser.slice(0,80)}`),
+  ]);
+
+  ok(res, null, 'Payment rejected. Customer notified via Email & WhatsApp.');
 };
 
 exports.destroy = async (req, res) => {

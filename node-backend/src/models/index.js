@@ -62,10 +62,14 @@ const paymentSchema = new Schema({
   pay_method:     String,
   transaction_id: String,
   screenshot_url: String,
-  status:         { type: String, enum: ['pending','verified','rejected'], default: 'pending' },
-  admin_notes:    String,
-  verified_by:    String,
-  verified_at:    Date,
+  status:              { type: String, enum: ['pending','verified','rejected','approved'], default: 'pending' },
+  admin_notes:         String,
+  verified_by:         String,
+  verified_at:         Date,
+  payment_verified:    { type: Boolean, default: false },
+  approved_at:         Date,
+  approved_by_ip:      String,
+  approved_by_browser: String,
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
 
 // ── Admin User ───────────────────────────────────────

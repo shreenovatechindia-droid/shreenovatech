@@ -2,10 +2,17 @@ const { Hosting } = require('../models');
 const { ok, err, logActivity } = require('../middleware/helpers');
 
 exports.index = async (req, res) => {
-  const filter = { is_active: true };
+  const filter = {};
+  if (!req.query.all) filter.is_active = true;
   if (req.query.type) filter.type = req.query.type;
   const rows = await Hosting.find(filter).sort({ sort_order: 1 });
   ok(res, rows);
+};
+
+exports.show = async (req, res) => {
+  const r = await Hosting.findById(req.params.id);
+  if (!r) return err(res, 'Hosting plan not found', 404);
+  ok(res, r);
 };
 
 exports.store = async (req, res) => {
