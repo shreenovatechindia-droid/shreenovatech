@@ -46,7 +46,9 @@ const whyUs = [
 ];
 
 const team = [
-  { name: 'Amit Ranjan',    role: 'Founder & CEO',           emoji: '👨‍💼', color: '#16A34A' },
+  { name: 'Amit Ranjan',    role: 'Founder & CEO',           emoji: '👨‍💼', color: '#16A34A', sub: 'Website, App and Software Development' },
+  { name: 'Devansh Kumar',  role: 'Co-Founder & CTO',        emoji: '💻', color: '#0F766E', sub: 'Technology & Software Development' },
+  { name: 'Aman Kumar',     role: 'Chief Operating Officer (COO)', emoji: '📊', color: '#B45309', sub: 'Operations & Client Success' },
   { name: 'Dev Team',       role: 'Web & App Development',   emoji: '👨‍💻', color: '#2563EB' },
   { name: 'Design Team',    role: 'UI/UX & Branding',        emoji: '🎨', color: '#7C3AED' },
   { name: 'Marketing Team', role: 'Digital Marketing & SEO', emoji: '📈', color: '#EA580C' },
@@ -101,12 +103,28 @@ function StatCard({ stat, started }) {
   );
 }
 
-const skills = ['React.js','React Native','PHP','JavaScript','HTML5','CSS3','Bootstrap','MySQL','Node.js','REST API','Git & GitHub','Cloud Hosting','SEO','Digital Marketing','AI / ML'];
-const achievements = [
+const amitSkills = ['React.js','React Native','PHP','JavaScript','HTML5','CSS3','Bootstrap','MySQL','Node.js','REST API','Git & GitHub','Cloud Hosting','SEO','Digital Marketing','AI / ML'];
+const amitAchievements = [
   { icon: '🚀', val: '500+',    label: 'Projects Delivered' },
   { icon: '😊', val: '10,000+', label: 'Happy Clients' },
   { icon: '⚡', val: '99.9%',   label: 'Hosting Uptime' },
   { icon: '🛡️', val: '24×7',   label: 'Client Support' },
+];
+
+const devanshSkills = ['React.js','Next.js','Node.js','TypeScript','JavaScript','Python','AWS','Docker','Kubernetes','MongoDB','PostgreSQL','REST API','GraphQL','Git & GitHub','System Design'];
+const devanshAchievements = [
+  { icon: '💻', val: '200+',  label: 'Apps Built' },
+  { icon: '☁️', val: '50+',   label: 'Cloud Projects' },
+  { icon: '⚡', val: '99.9%', label: 'System Uptime' },
+  { icon: '🛡️', val: '24×7', label: 'Tech Support' },
+];
+
+const amanSkills = ['Operations Management','Client Success','Project Management','Business Strategy','CRM Tools','Team Leadership','Process Optimization','Agile / Scrum','Vendor Management','Quality Assurance','Reporting & Analytics','Communication'];
+const amanAchievements = [
+  { icon: '🤝', val: '10K+',  label: 'Clients Managed' },
+  { icon: '📈', val: '98%',   label: 'Client Retention' },
+  { icon: '⚡', val: '500+',  label: 'Projects Delivered' },
+  { icon: '🛡️', val: '24×7', label: 'Client Support' },
 ];
 
 function FounderModal({ onClose }) {
@@ -150,12 +168,12 @@ function FounderModal({ onClose }) {
 
             <div className="fm-block-label">Skills</div>
             <div className="fm-skills">
-              {skills.map(s => <span key={s} className="fm-skill">{s}</span>)}
+              {amitSkills.map(s => <span key={s} className="fm-skill">{s}</span>)}
             </div>
 
             <div className="fm-block-label">Achievements</div>
             <div className="fm-achievements">
-              {achievements.map(a => (
+              {amitAchievements.map(a => (
                 <div key={a.label} className="fm-achievement">
                   <span className="fm-ach-icon">{a.icon}</span>
                   <span className="fm-ach-val">{a.val}</span>
@@ -176,10 +194,126 @@ function FounderModal({ onClose }) {
   );
 }
 
+function DevanshModal({ onClose }) {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    const onKey = e => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => { document.body.style.overflow = ''; window.removeEventListener('keydown', onKey); };
+  }, [onClose]);
+
+  return (
+    <div className="fm-overlay" onClick={onClose}>
+      <div className="fm-modal" onClick={e => e.stopPropagation()}>
+        <button className="fm-close" onClick={onClose}>✕</button>
+        <div className="fm-inner">
+          <div className="fm-left">
+            <img src="/d.jpeg" alt="Devansh Kumar" className="fm-photo" />
+            <h3 className="fm-name">Devansh Kumar</h3>
+            <p className="fm-designation">Co-Founder & CTO</p>
+            <p className="fm-company">ShreeNova Tech</p>
+            <div className="fm-meta">
+              <span>🛠️ Technology & Software Development</span>
+              <span>📍 India</span>
+            </div>
+            <div className="fm-socials">
+              <a href="mailto:support@shreenovatech.in" className="fm-social-btn" title="Email">✉️</a>
+            </div>
+          </div>
+          <div className="fm-right">
+            <div className="fm-section-tag">About the Co-Founder & CTO</div>
+            <p className="fm-desc">Devansh Kumar is the Co-Founder & CTO of ShreeNova Tech, leading all technology and software development initiatives of the company.</p>
+            <p className="fm-desc">He specializes in full-stack development, cloud architecture, system design, and building scalable software products that power ShreeNova Tech's client solutions.</p>
+            <p className="fm-desc">His vision is to keep ShreeNova Tech at the forefront of modern technology — delivering fast, secure, and future-ready digital products.</p>
+            <div className="fm-block-label">Skills</div>
+            <div className="fm-skills">
+              {devanshSkills.map(s => <span key={s} className="fm-skill">{s}</span>)}
+            </div>
+            <div className="fm-block-label">Achievements</div>
+            <div className="fm-achievements">
+              {devanshAchievements.map(a => (
+                <div key={a.label} className="fm-achievement">
+                  <span className="fm-ach-icon">{a.icon}</span>
+                  <span className="fm-ach-val">{a.val}</span>
+                  <span className="fm-ach-label">{a.label}</span>
+                </div>
+              ))}
+            </div>
+            <div className="fm-btns">
+              <Link to="/book-now" className="fm-btn-primary" onClick={onClose}>Book Consultation</Link>
+              <a href="mailto:support@shreenovatech.in" className="fm-btn-outline">✉️ Email</a>
+              <a href="https://wa.me/918987050207" target="_blank" rel="noreferrer" className="fm-btn-wa">💬 WhatsApp</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AmanModal({ onClose }) {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    const onKey = e => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => { document.body.style.overflow = ''; window.removeEventListener('keydown', onKey); };
+  }, [onClose]);
+
+  return (
+    <div className="fm-overlay" onClick={onClose}>
+      <div className="fm-modal" onClick={e => e.stopPropagation()}>
+        <button className="fm-close" onClick={onClose}>✕</button>
+        <div className="fm-inner">
+          <div className="fm-left">
+            <img src="/aman.jpeg" alt="Aman Kumar" className="fm-photo" />
+            <h3 className="fm-name">Aman Kumar</h3>
+            <p className="fm-designation">Chief Operating Officer (COO)</p>
+            <p className="fm-company">ShreeNova Tech</p>
+            <div className="fm-meta">
+              <span>📋 Operations & Client Success</span>
+              <span>📍 India</span>
+            </div>
+            <div className="fm-socials">
+              <a href="mailto:support@shreenovatech.in" className="fm-social-btn" title="Email">✉️</a>
+            </div>
+          </div>
+          <div className="fm-right">
+            <div className="fm-section-tag">About the COO</div>
+            <p className="fm-desc">Aman Kumar is the Chief Operating Officer (COO) of ShreeNova Tech, responsible for overseeing day-to-day operations and ensuring exceptional client success.</p>
+            <p className="fm-desc">He manages project delivery pipelines, client relationships, team coordination, and operational efficiency — ensuring every project is delivered on time and exceeds expectations.</p>
+            <p className="fm-desc">His focus on process optimization and client satisfaction has been key to ShreeNova Tech's 98% client retention rate and 10,000+ happy clients.</p>
+            <div className="fm-block-label">Skills</div>
+            <div className="fm-skills">
+              {amanSkills.map(s => <span key={s} className="fm-skill">{s}</span>)}
+            </div>
+            <div className="fm-block-label">Achievements</div>
+            <div className="fm-achievements">
+              {amanAchievements.map(a => (
+                <div key={a.label} className="fm-achievement">
+                  <span className="fm-ach-icon">{a.icon}</span>
+                  <span className="fm-ach-val">{a.val}</span>
+                  <span className="fm-ach-label">{a.label}</span>
+                </div>
+              ))}
+            </div>
+            <div className="fm-btns">
+              <Link to="/book-now" className="fm-btn-primary" onClick={onClose}>Book Consultation</Link>
+              <a href="mailto:support@shreenovatech.in" className="fm-btn-outline">✉️ Email</a>
+              <a href="https://wa.me/918987050207" target="_blank" rel="noreferrer" className="fm-btn-wa">💬 WhatsApp</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AboutPage() {
   const statsRef = useRef();
   const [statsStarted, setStatsStarted] = useState(false);
   const [founderModal, setFounderModal] = useState(false);
+  const [devanshModal, setDevanshModal] = useState(false);
+  const [amanModal, setAmanModal] = useState(false);
 
   useEffect(() => {
     const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setStatsStarted(true); }, { threshold: 0.3 });
@@ -353,25 +487,38 @@ export default function AboutPage() {
           <div className="ab-team-grid">
             {team.map((t, i) => (
               <div
-                className={`ab-team-card${t.name === 'Amit Ranjan' ? ' ab-team-card-clickable' : ''}`}
+                className={`ab-team-card${
+                  ['Amit Ranjan','Devansh Kumar','Aman Kumar'].includes(t.name) ? ' ab-team-card-clickable' : ''
+                }`}
                 key={t.name}
                 data-aos="fade-up"
                 data-aos-delay={i * 80}
                 style={{ '--tc': t.color }}
-                onClick={t.name === 'Amit Ranjan' ? () => setFounderModal(true) : undefined}
+                onClick={
+                  t.name === 'Amit Ranjan'   ? () => setFounderModal(true) :
+                  t.name === 'Devansh Kumar' ? () => setDevanshModal(true) :
+                  t.name === 'Aman Kumar'    ? () => setAmanModal(true)    : undefined
+                }
               >
                 {t.name === 'Amit Ranjan'
                   ? <img src="/amit.jpg" alt="Amit Ranjan" className="ab-team-photo" />
+                  : t.name === 'Devansh Kumar'
+                  ? <img src="/d.jpeg" alt="Devansh Kumar" className="ab-team-photo" />
+                  : t.name === 'Aman Kumar'
+                  ? <img src="/aman.jpeg" alt="Aman Kumar" className="ab-team-photo" />
                   : <div className="ab-team-avatar">{t.emoji}</div>
                 }
                 <h4>{t.name}</h4>
                 <p>{t.role}</p>
-                {t.name === 'Amit Ranjan' && <span className="ab-team-view">View Profile →</span>}
+                {t.sub && <span className="ab-team-sub">{t.sub}</span>}
+                {['Amit Ranjan','Devansh Kumar','Aman Kumar'].includes(t.name) && <span className="ab-team-view">View Profile →</span>}
                 <div className="ab-team-line" />
               </div>
             ))}
           </div>
-          {founderModal && <FounderModal onClose={() => setFounderModal(false)} />}
+          {founderModal  && <FounderModal  onClose={() => setFounderModal(false)}  />}
+          {devanshModal  && <DevanshModal  onClose={() => setDevanshModal(false)}  />}
+          {amanModal     && <AmanModal     onClose={() => setAmanModal(false)}     />}
         </div>
       </section>
 

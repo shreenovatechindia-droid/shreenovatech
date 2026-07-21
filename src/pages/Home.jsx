@@ -11,6 +11,7 @@ import Stats from '../components/Stats';
 import HelpSection from '../components/HelpSection';
 import Testimonials from '../components/Testimonials';
 import Contact from '../components/Contact';
+import EnquiryPopup from '../components/EnquiryPopup';
 
 export default function Home() {
   useEffect(() => {
@@ -19,6 +20,7 @@ export default function Home() {
 
   return (
     <MainLayout>
+      <EnquiryPopup />
       <Hero />
       <Pricing />
       <WhyChooseUs />

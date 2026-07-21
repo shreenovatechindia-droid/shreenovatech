@@ -1,0 +1,467 @@
+/* ═══════════════════════════════════════════════
+   ENQUIRY POPUP — Premium SaaS UI
+   ═══════════════════════════════════════════════ */
+
+/* ── Overlay ──────────────────────────────────── */
+.ep-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: ep-overlay-in 0.35s ease forwards;
+}
+.ep-overlay.ep-closing {
+  animation: ep-overlay-out 0.32s ease forwards;
+}
+@keyframes ep-overlay-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ep-overlay-out { from { opacity: 1; } to { opacity: 0; } }
+
+/* ── Modal ────────────────────────────────────── */
+.ep-modal {
+  width: 560px;
+  max-width: 95%;
+  max-height: 94vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 35px 90px rgba(0, 0, 0, 0.18), 0 8px 32px rgba(22, 163, 74, 0.08);
+  animation: ep-modal-in 0.38s cubic-bezier(0.34, 1.52, 0.64, 1) forwards;
+}
+.ep-overlay.ep-closing .ep-modal {
+  animation: ep-modal-out 0.28s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+@keyframes ep-modal-in {
+  from { opacity: 0; transform: scale(0.84) translateY(28px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+@keyframes ep-modal-out {
+  from { opacity: 1; transform: scale(1)    translateY(0); }
+  to   { opacity: 0; transform: scale(0.9)  translateY(16px); }
+}
+
+/* Scrollbar */
+.ep-modal::-webkit-scrollbar { width: 4px; }
+.ep-modal::-webkit-scrollbar-track { background: transparent; }
+.ep-modal::-webkit-scrollbar-thumb { background: #22c55e; border-radius: 10px; }
+
+/* ── Close Button ─────────────────────────────── */
+.ep-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s;
+}
+.ep-close:hover {
+  background: rgba(255, 255, 255, 0.38);
+  border-color: rgba(255, 255, 255, 0.75);
+  transform: rotate(90deg) scale(1.1);
+}
+.ep-close:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* ── Header ───────────────────────────────────── */
+.ep-header {
+  position: relative;
+  background: linear-gradient(145deg, #16a34a 0%, #1db954 45%, #22c55e 100%);
+  padding: 40px 32px 52px;
+  text-align: center;
+  border-radius: 28px 28px 0 0;
+  overflow: hidden;
+}
+
+/* Decorative orbs */
+.ep-header-orb {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+.ep-header-orb--1 { width: 180px; height: 180px; top: -60px; right: -50px; }
+.ep-header-orb--2 { width: 120px; height: 120px; bottom: 10px; left: -40px; background: rgba(255,255,255,0.06); }
+.ep-header-orb--3 { width: 60px;  height: 60px;  top: 20px; left: 30px; background: rgba(255,255,255,0.1); }
+
+/* Rocket illustration */
+.ep-rocket {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 14px;
+  position: relative;
+  z-index: 1;
+  animation: ep-rocket-float 3s ease-in-out infinite;
+  filter: drop-shadow(0 6px 16px rgba(0,0,0,0.2));
+}
+@keyframes ep-rocket-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%       { transform: translateY(-8px) rotate(2deg); }
+}
+
+.ep-header h2 {
+  color: #fff;
+  font-size: 1.45rem;
+  font-weight: 800;
+  margin: 0 0 8px;
+  line-height: 1.3;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  letter-spacing: -0.3px;
+}
+.ep-header p {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.9rem;
+  margin: 0 0 18px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Badges */
+.ep-badges {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+.ep-badges span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+  letter-spacing: 0.2px;
+}
+
+/* Wave divider */
+.ep-header-wave {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 32px;
+  z-index: 1;
+}
+.ep-header-wave svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── Body ─────────────────────────────────────── */
+.ep-body {
+  padding: 28px 32px 32px;
+}
+
+/* ── Floating Label Fields ────────────────────── */
+.ep-field {
+  position: relative;
+  margin-bottom: 20px;
+  animation: ep-field-up 0.4s ease both;
+}
+.ep-field:nth-child(1) { animation-delay: 0.05s; }
+.ep-field:nth-child(2) { animation-delay: 0.10s; }
+.ep-field:nth-child(3) { animation-delay: 0.15s; }
+.ep-field:nth-child(4) { animation-delay: 0.20s; }
+@keyframes ep-field-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ep-input-wrap {
+  position: relative;
+}
+
+/* Icon */
+.ep-input-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  transition: color 0.2s;
+  z-index: 1;
+}
+
+/* Input */
+.ep-input-wrap input {
+  width: 100%;
+  height: 58px;
+  padding: 18px 16px 6px 46px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 16px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #111827;
+  background: #f9fafb;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.22s, box-shadow 0.22s, background 0.22s;
+}
+.ep-input-wrap input:focus {
+  border-color: #22c55e;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12), 0 2px 8px rgba(34, 197, 94, 0.08);
+}
+.ep-input-wrap input:focus + label,
+.ep-input-wrap input:not(:placeholder-shown) + label {
+  top: 10px;
+  font-size: 0.7rem;
+  color: #16a34a;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+.ep-input-wrap input:focus ~ .ep-input-icon,
+.ep-field--filled .ep-input-icon {
+  color: #16a34a;
+}
+
+/* Floating label */
+.ep-input-wrap label {
+  position: absolute;
+  left: 46px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #9ca3af;
+  pointer-events: none;
+  transition: top 0.2s ease, font-size 0.2s ease, color 0.2s ease, font-weight 0.2s ease;
+  background: transparent;
+  line-height: 1;
+}
+
+/* Required star */
+.ep-req { color: #ef4444; margin-left: 2px; }
+
+/* Error state */
+.ep-field--error .ep-input-wrap input {
+  border-color: #ef4444;
+  background: #fff5f5;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.08);
+}
+.ep-field--error .ep-input-wrap input:focus + label,
+.ep-field--error .ep-input-wrap input:not(:placeholder-shown) + label {
+  color: #ef4444;
+}
+.ep-err-msg {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.74rem;
+  color: #ef4444;
+  font-weight: 600;
+  margin-top: 6px;
+  padding-left: 4px;
+  animation: ep-err-in 0.2s ease;
+}
+.ep-err-msg::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ef4444' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='12' y1='8' x2='12' y2='12'/%3E%3Cline x1='12' y1='16' x2='12.01' y2='16'/%3E%3C/svg%3E") center/contain no-repeat;
+  flex-shrink: 0;
+}
+@keyframes ep-err-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Submit Button ────────────────────────────── */
+.ep-submit {
+  width: 100%;
+  height: 58px;
+  margin-top: 8px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease;
+  box-shadow: 0 4px 20px rgba(22, 163, 74, 0.38);
+}
+.ep-submit::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 55%);
+  border-radius: 16px;
+  pointer-events: none;
+}
+.ep-submit:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 10px 36px rgba(22, 163, 74, 0.52);
+}
+.ep-submit:active:not(:disabled) {
+  transform: translateY(0) scale(0.99);
+}
+.ep-submit:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+.ep-btn-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+
+/* Loading spinner */
+.ep-spinner-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.ep-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: ep-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes ep-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Footer note ──────────────────────────────── */
+.ep-footer-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  text-align: center;
+  font-size: 0.72rem;
+  color: #9ca3af;
+  margin-top: 14px;
+  font-weight: 500;
+}
+
+/* ── Success Card ─────────────────────────────── */
+.ep-success {
+  text-align: center;
+  padding: 48px 28px 40px;
+  animation: ep-success-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes ep-success-in {
+  from { opacity: 0; transform: scale(0.88) translateY(12px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+.ep-success-ring {
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 20px;
+}
+.ep-check-svg {
+  width: 100%;
+  height: 100%;
+}
+.ep-check-circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  animation: ep-circle-draw 0.5s cubic-bezier(0.65, 0, 0.45, 1) 0.1s forwards;
+}
+.ep-check-tick {
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: ep-tick-draw 0.35s ease 0.55s forwards;
+}
+@keyframes ep-circle-draw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes ep-tick-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+.ep-success h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 8px;
+  letter-spacing: -0.3px;
+}
+.ep-success p {
+  color: #6b7280;
+  font-size: 0.92rem;
+  margin: 0 0 24px;
+}
+
+/* Animated dots */
+.ep-success-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.ep-success-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: ep-dot-bounce 1.2s ease-in-out infinite;
+}
+.ep-success-dots span:nth-child(2) { animation-delay: 0.2s; background: #16a34a; }
+.ep-success-dots span:nth-child(3) { animation-delay: 0.4s; background: #15803d; }
+@keyframes ep-dot-bounce {
+  0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; }
+  40%           { transform: scale(1.2); opacity: 1; }
+}
+
+/* ── Responsive ───────────────────────────────── */
+@media (max-width: 768px) {
+  .ep-modal  { max-width: 92%; border-radius: 24px; }
+  .ep-header { padding: 32px 24px 48px; border-radius: 24px 24px 0 0; }
+  .ep-header h2 { font-size: 1.25rem; }
+  .ep-body   { padding: 24px 20px 28px; }
+}
+@media (max-width: 480px) {
+  .ep-modal  { max-width: 95%; border-radius: 20px; }
+  .ep-header { padding: 28px 18px 44px; border-radius: 20px 20px 0 0; }
+  .ep-header h2 { font-size: 1.1rem; }
+  .ep-body   { padding: 20px 16px 24px; }
+  .ep-badges span { font-size: 0.68rem; padding: 3px 8px; }
+  .ep-rocket { width: 60px; height: 60px; }
+}

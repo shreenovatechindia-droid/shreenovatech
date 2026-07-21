@@ -132,21 +132,7 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* WhatsApp Float */}
-      <a
-        href="https://wa.me/918987050207"
-        style={{
-          position:'fixed', bottom:24, right:24, zIndex:9999,
-          background:'#25d366', color:'#fff', width:54, height:54,
-          borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center',
-          fontSize:26, boxShadow:'0 4px 20px rgba(37,211,102,0.4)',
-          textDecoration:'none', transition:'transform 0.2s',
-        }}
-        onMouseEnter={e => e.currentTarget.style.transform='scale(1.1)'}
-        onMouseLeave={e => e.currentTarget.style.transform='scale(1)'}
-      >
-        <FaWhatsapp />
-      </a>
+
     </footer>
   );
 }

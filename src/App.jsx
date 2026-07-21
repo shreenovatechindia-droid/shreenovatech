@@ -31,6 +31,7 @@ import DigitalMarketingPage, { SocialMediaPage, GoogleAdsPage, ContentMarketingP
 import SEOPage from './pages/SEOPage';
 import AboutPage from './pages/AboutPage';
 
+import FloatingContactWidget from './components/FloatingContactWidget';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/global.css';
 import './css/sections.css';
@@ -51,6 +52,7 @@ export default function App() {
     <BrowserRouter>
       <ToastProvider />
       <GATracker />
+      <FloatingContactWidget />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/payment" element={<PaymentPage />} />
