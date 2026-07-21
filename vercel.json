@@ -4,15 +4,18 @@
   "outputDirectory": "dist",
   "installCommand": "npm install",
   "framework": null,
-  "redirects": [
-    {
-      "source": "/(.*)",
-      "has": [{ "type": "host", "value": "www.shreenovatech.in" }],
-      "destination": "https://shreenovatech.in/$1",
-      "permanent": true
-    }
-  ],
   "routes": [
+    {
+      "src": "/(.*)",
+      "has": [{ "type": "host", "value": "www.shreenovatech.in" }],
+      "headers": { "Location": "https://shreenovatech.in/$1" },
+      "status": 301,
+      "dest": "/$1"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "https://shreenovatech.onrender.com/api/$1"
+    },
     {
       "src": "/admin/assets/(.*)",
       "dest": "/admin/assets/$1"
