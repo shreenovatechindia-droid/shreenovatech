@@ -1,4 +1,4 @@
-const db = require('../config/db');
+const { Payment } = require('../models');
 const { ok, err, paginate, genRef, logActivity } = require('../middleware/helpers');
 
 const PKG_MAP = {
@@ -8,37 +8,33 @@ const PKG_MAP = {
 };
 
 exports.index = async (req, res) => {
-  const page   = Math.max(1, parseInt(req.query.page)  || 1);
-  const limit  = Math.min(100, parseInt(req.query.limit) || 20);
-  const offset = (page - 1) * limit;
+  const page  = Math.max(1, parseInt(req.query.page)  || 1);
+  const limit = Math.min(100, parseInt(req.query.limit) || 20);
   const { status, package: pkg, search } = req.query;
 
-  const where = [], params = [];
-  if (status) { where.push('status = ?'); params.push(status); }
-  if (pkg)    { where.push('package_key = ?'); params.push(pkg); }
-  if (search) {
-    where.push('(full_name LIKE ? OR email LIKE ? OR ref_id LIKE ?)');
-    const s = `%${search}%`;
-    params.push(s, s, s);
-  }
-  const whereSQL = where.length ? 'WHERE ' + where.join(' AND ') : '';
+  const filter = {};
+  if (status) filter.status = status;
+  if (pkg)    filter.package_key = pkg;
+  if (search) filter.$or = [
+    { full_name: new RegExp(search,'i') },
+    { email: new RegExp(search,'i') },
+    { ref_id: new RegExp(search,'i') },
+  ];
 
-  const [[{ total }]] = await db.execute(`SELECT COUNT(*) as total FROM payments ${whereSQL}`, params);
-  const [rows] = await db.execute(
-    `SELECT * FROM payments ${whereSQL} ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`, params
-  );
-  ok(res, { payments: rows, pagination: paginate(Number(total), page, limit) });
+  const total = await Payment.countDocuments(filter);
+  const rows  = await Payment.find(filter).sort({ created_at: -1 }).skip((page-1)*limit).limit(limit);
+  ok(res, { payments: rows, pagination: paginate(total, page, limit) });
 };
 
 exports.show = async (req, res) => {
-  const [rows] = await db.execute('SELECT * FROM payments WHERE id = ?', [req.params.id]);
-  if (!rows[0]) return err(res, 'Payment not found', 404);
-  ok(res, rows[0]);
+  const p = await Payment.findById(req.params.id);
+  if (!p) return err(res, 'Payment not found', 404);
+  ok(res, p);
 };
 
 exports.store = async (req, res) => {
-  const { fullName, mobile, email, payMethod, package: pkgKey = 'silver',
-          whatsapp, company, gst, address, city, state, country = 'India',
+  const { fullName, mobile, email, payMethod, package: pkgKey='silver',
+          whatsapp, company, gst, address, city, state, country='India',
           pincode, transaction_id } = req.body;
 
   if (!fullName) return err(res, 'Full name is required.');
@@ -47,36 +43,35 @@ exports.store = async (req, res) => {
   if (!payMethod) return err(res, 'Please select a payment method.');
 
   const [pkgName, amount] = PKG_MAP[pkgKey] || PKG_MAP.silver;
-  const gstAmt   = Math.round(amount * 0.18);
-  const total    = amount + gstAmt;
-  const refId    = genRef('PAY');
-  const screenshotUrl = req.file
-    ? `${process.env.BASE_URL}/uploads/payments/${req.file.filename}` : '';
+  const gstAmt  = Math.round(amount * 0.18);
+  const total   = amount + gstAmt;
+  const refId   = genRef('PAY');
+  const ssUrl   = req.file ? `${process.env.BASE_URL}/uploads/payments/${req.file.filename}` : '';
 
-  await db.execute(
-    `INSERT INTO payments (ref_id,full_name,mobile,whatsapp,email,company,gst,address,city,state,
-     country,pincode,package_key,package_name,amount,gst_amount,total_amount,pay_method,transaction_id,screenshot_url)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-    [refId, fullName, mobile, whatsapp||'', email, company||'', gst||'', address||'',
-     city||'', state||'', country, pincode||'', pkgKey, pkgName,
-     amount, gstAmt, total, payMethod, transaction_id||'', screenshotUrl]
-  );
+  await Payment.create({
+    ref_id: refId, full_name: fullName, mobile, whatsapp: whatsapp||'', email,
+    company: company||'', gst: gst||'', address: address||'',
+    city: city||'', state: state||'', country, pincode: pincode||'',
+    package_key: pkgKey, package_name: pkgName,
+    amount, gst_amount: gstAmt, total_amount: total,
+    pay_method: payMethod, transaction_id: transaction_id||'', screenshot_url: ssUrl,
+  });
   ok(res, { ref_id: refId }, 'Payment submitted successfully', 201);
 };
 
 exports.updateStatus = async (req, res) => {
   const { status, admin_notes } = req.body;
   if (!['pending','verified','rejected'].includes(status)) return err(res, 'Invalid status.');
-  await db.execute(
-    'UPDATE payments SET status=?, admin_notes=?, verified_by=?, verified_at=NOW() WHERE id=?',
-    [status, admin_notes||'', req.user.id, req.params.id]
-  );
+  await Payment.findByIdAndUpdate(req.params.id, {
+    status, admin_notes: admin_notes||'',
+    verified_by: req.user.id, verified_at: new Date(),
+  });
   await logActivity(req.user.id, `payment_${status}`, 'payments', req.params.id);
   ok(res, null, 'Payment status updated');
 };
 
 exports.destroy = async (req, res) => {
-  await db.execute('DELETE FROM payments WHERE id = ?', [req.params.id]);
+  await Payment.findByIdAndDelete(req.params.id);
   await logActivity(req.user.id, 'delete', 'payments', req.params.id);
   ok(res, null, 'Payment deleted');
 };

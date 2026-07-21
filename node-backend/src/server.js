@@ -4,8 +4,12 @@ const cors      = require('cors');
 const helmet    = require('helmet');
 const path      = require('path');
 const rateLimit = require('express-rate-limit');
+const { connect } = require('./config/db');
 
 const app = express();
+
+// ── Connect MongoDB ───────────────────────────────────────────
+connect();
 
 // ── Trust Proxy (Render/Vercel) ──────────────────────────────
 app.set('trust proxy', 1);
@@ -17,6 +21,8 @@ app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3001',
+  'https://shreenovatech.in',
+  'https://www.shreenovatech.in',
   process.env.FRONTEND_URL,
   process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
 ].filter(Boolean);

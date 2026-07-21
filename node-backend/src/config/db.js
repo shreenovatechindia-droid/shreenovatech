@@ -1,20 +1,15 @@
-const { Pool } = require('pg');
-require('dotenv').config();
+const mongoose = require('mongoose');
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-});
-
-// MySQL-compatible wrapper: converts ? placeholders to $1,$2,... and returns [rows] format
-pool.execute = async (sql, params = []) => {
-  let i = 0;
-  const pgSql = sql.replace(/\?/g, () => `$${++i}`);
-  const result = await pool.query(pgSql, params);
-  return [result.rows, result.fields];
+const connect = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('✅ MongoDB Atlas connected');
+  } catch (err) {
+    console.error('❌ MongoDB connection error:', err.message);
+    process.exit(1);
+  }
 };
 
-pool.on('connect', () => console.log('✅ PostgreSQL connected'));
-pool.on('error', (err) => console.error('❌ PostgreSQL error:', err.message));
+mongoose.connection.on('disconnected', () => console.warn('⚠️ MongoDB disconnected'));
 
-module.exports = pool;
+module.exports = { connect, mongoose };

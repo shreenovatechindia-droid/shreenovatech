@@ -1,41 +1,38 @@
-const db = require('../config/db');
-const { ok, err, logActivity } = require('../middleware/helpers');
+const { Stat, Visitor } = require('../models');
+const { ok, logActivity } = require('../middleware/helpers');
 
 exports.index = async (req, res) => {
-  const [rows] = await db.execute('SELECT * FROM site_stats ORDER BY sort_order ASC');
+  const rows = await Stat.find().sort({ sort_order: 1 });
   ok(res, rows);
 };
 
 exports.update = async (req, res) => {
   const { num_value, suffix, label } = req.body;
-  await db.execute(
-    'UPDATE site_stats SET num_value=?,suffix=?,label=? WHERE id=?',
-    [parseFloat(num_value)||0, suffix||'', label||'', req.params.id]
-  );
+  await Stat.findByIdAndUpdate(req.params.id, {
+    num_value: parseFloat(num_value)||0, suffix: suffix||'', label: label||'',
+  });
   await logActivity(req.user.id, 'update', 'stats', req.params.id);
   ok(res, null, 'Stat updated');
 };
 
 exports.track = async (req, res) => {
-  const { page = '/', referrer = '' } = req.body;
-  const ua   = req.headers['user-agent'] || '';
-  const ip   = req.ip || '';
-  const date = new Date().toISOString().slice(0, 10);
-  await db.execute(
-    'INSERT INTO visitors (ip_address,page,user_agent,referrer,visit_date) VALUES (?,?,?,?,?)',
-    [ip, page, ua, referrer, date]
-  );
+  const { page='/', referrer='' } = req.body;
+  await Visitor.create({
+    ip_address: req.ip||'', page,
+    user_agent: req.headers['user-agent']||'',
+    referrer, visit_date: new Date().toISOString().slice(0,10),
+  });
   ok(res, null, 'Tracked');
 };
 
 exports.visitors = async (req, res) => {
-  const { days = 30 } = req.query;
-  const [rows] = await db.execute(`
-    SELECT visit_date, COUNT(*) as visits
-    FROM visitors
-    WHERE visit_date >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
-    GROUP BY visit_date
-    ORDER BY visit_date ASC
-  `, [parseInt(days)]);
+  const days = parseInt(req.query.days) || 30;
+  const from = new Date(Date.now() - days*24*60*60*1000).toISOString().slice(0,10);
+  const rows = await Visitor.aggregate([
+    { $match: { visit_date: { $gte: from } } },
+    { $group: { _id: '$visit_date', visits: { $sum: 1 } } },
+    { $sort: { _id: 1 } },
+    { $project: { visit_date: '$_id', visits: 1, _id: 0 } },
+  ]);
   ok(res, rows);
 };

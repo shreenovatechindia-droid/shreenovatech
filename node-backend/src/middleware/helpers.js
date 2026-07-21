@@ -1,5 +1,3 @@
-const db = require('../config/db');
-
 const ok  = (res, data = null, message = 'Success', code = 200) =>
   res.status(code).json({ success: true, message, data });
 
@@ -20,10 +18,8 @@ const genRef = (prefix = 'SNT') =>
 
 const logActivity = async (adminId, action, module, recordId = null, details = null) => {
   try {
-    await db.execute(
-      'INSERT INTO activity_log (admin_id, action, module, record_id, details, ip_address) VALUES (?,?,?,?,?,?)',
-      [adminId, action, module, recordId, details, '']
-    );
+    const { Activity } = require('../models');
+    await Activity.create({ admin_id: String(adminId), action, module, record_id: String(recordId), details });
   } catch {}
 };
 
