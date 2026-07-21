@@ -1,34 +1,28 @@
 const router = require('express').Router();
-const db     = require('../config/db');
-const { ok, err } = require('../middleware/helpers');
-const { auth, roles } = require('../middleware/auth');
+const { Notification } = require('../models');
+const { ok } = require('../middleware/helpers');
+const { auth } = require('../middleware/auth');
 
-// GET all notifications (admin)
 router.get('/', auth, async (req, res) => {
   try {
-    const [rows] = await db.execute(
-      'SELECT * FROM notifications ORDER BY created_at DESC LIMIT 50'
-    );
-    const [[{ unread }]] = await db.execute(
-      'SELECT COUNT(*) as unread FROM notifications WHERE is_read = 0'
-    );
-    ok(res, { notifications: rows, unread: Number(unread) });
+    const notifications = await Notification.find().sort({ created_at: -1 }).limit(50);
+    const unread = await Notification.countDocuments({ is_read: false });
+    ok(res, { notifications, unread });
   } catch { ok(res, { notifications: [], unread: 0 }); }
 });
 
-// PUT mark one as read
 router.put('/read-all', auth, async (req, res) => {
-  await db.execute('UPDATE notifications SET is_read = 1');
+  await Notification.updateMany({}, { is_read: true });
   ok(res, null, 'All marked as read');
 });
 
 router.put('/:id', auth, async (req, res) => {
-  await db.execute('UPDATE notifications SET is_read = 1 WHERE id = ?', [req.params.id]);
+  await Notification.findByIdAndUpdate(req.params.id, { is_read: true });
   ok(res, null, 'Marked as read');
 });
 
 router.delete('/:id', auth, async (req, res) => {
-  await db.execute('DELETE FROM notifications WHERE id = ?', [req.params.id]);
+  await Notification.findByIdAndDelete(req.params.id);
   ok(res, null, 'Deleted');
 });
 
