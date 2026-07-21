@@ -7,8 +7,8 @@
   "routes": [
     {
       "src": "/(.*)",
-      "has": [{ "type": "host", "value": "www.shreenovatech.in" }],
-      "headers": { "Location": "https://shreenovatech.in/$1" },
+      "has": [{ "type": "host", "value": "shreenovatech.in" }],
+      "headers": { "Location": "https://www.shreenovatech.in/$1" },
       "status": 301,
       "dest": "/$1"
     },
