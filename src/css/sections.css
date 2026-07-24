@@ -221,7 +221,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 30px;
-  align-items: start;
+  align-items: stretch;
 }
 
 /* Card */
@@ -339,6 +339,7 @@
 }
 .pc-features li:last-child { border-bottom: none; }
 .pc-check { color: var(--green); flex-shrink: 0; }
+.pc-cross { color: #e03030; flex-shrink: 0; }
 
 /* Button */
 .pc-btn {

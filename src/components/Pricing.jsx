@@ -1,24 +1,53 @@
-import { useState, useEffect } from 'react';
-import { FiCheck } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
-import { getPricing } from '../utils/api';
+import { FiCheck, FiX } from 'react-icons/fi';
 import '../css/sections.css';
 
-const FALLBACK = [
-  { badge:'SILVER', badge_class:'badge-silver', name:'Silver Package', description:'Perfect for Beginners & simple blog sites.', price:'₹9,999', renewal:'Renewal After 1 Year Only ₹2500', is_featured:0, features:['1 Year Free Domain','1 Year Free Hosting','Up to 5 Pages','2 Business Emails','SSL Security','Mobile / Friendly Design','Call / Chat Button','Basic SEO Setup','Basic Speed Optimization','Basic Support','Delivery Time 3-5 Days','Payment & Shipping Integration'] },
-  { badge:'GOLDEN', badge_class:'badge-gold',   name:'Golden Package', description:'Perfect for startups & e-commerce sites.', price:'₹14,999', renewal:'Renewal After 1 Year Only ₹2500', is_featured:1, features:['1 Year Free Domain','1 Year Free Hosting','Up to 5 to 10 Pages','5 Business Emails','SSL Security','Mobile Friendly Design','Call / Chat Button','Advanced SEO Setup','Advanced Speed Optimization','Advanced Support','Delivery Time 5-7 Days','Payment & Shipping Integration'] },
-  { badge:'DIAMOND', badge_class:'badge-diamond', name:'Diamond Package', description:'Perfect for Advance & Customized sites.', price:'₹19,999', renewal:'Renewal After 1 Year Only ₹2500', is_featured:0, features:['1 Year Free Domain','1 Year Free Hosting','Up to 10 to 15 Pages','Unlimited Business Emails','SSL Security','Mobile Friendly Design','Call / Chat Button','Premium SEO Setup','Premium Speed Optimization','Premium Support','Delivery Time 7-10 Days','Payment & Shipping Integration'] },
+const PLANS = [
+  {
+    badge: 'BASIC', badge_class: 'badge-silver',
+    name: 'Basic Website Package',
+    description: 'Perfect for businesses needing a clean static online presence.',
+    price: '₹14,999',
+    renewal: 'Renewal After 1 Year Only ₹4999',
+    is_featured: 0,
+    features: [
+      { text: '1 Year Free Domain', included: true },
+      { text: 'Static Website', included: true },
+      { text: 'No Backend', included: true },
+      { text: 'Admin Dashboard', included: false },
+    ],
+  },
+  {
+    badge: 'DYNAMIC', badge_class: 'badge-gold',
+    name: 'Dynamic Website Package',
+    description: 'Perfect for startups & businesses needing a dynamic web solution.',
+    price: '₹29,999',
+    renewal: 'Renewal After 1 Year Only ₹4999',
+    is_featured: 1,
+    features: [
+      { text: '1 Year Free Domain', included: true },
+      { text: 'Dynamic Website', included: true },
+      { text: 'Backend Included', included: true },
+      { text: 'Admin Dashboard', included: false },
+    ],
+  },
+  {
+    badge: 'DIAMOND', badge_class: 'badge-diamond',
+    name: 'Diamond Package',
+    description: 'Perfect for advanced & fully customized web applications.',
+    price: '₹49,999',
+    renewal: 'Renewal After 1 Year Only ₹4999',
+    is_featured: 0,
+    features: [
+      { text: '1 Year Free Domain', included: true },
+      { text: 'Dynamic Website', included: true },
+      { text: 'Backend Included', included: true },
+      { text: 'Admin Dashboard Included', included: true },
+    ],
+  },
 ];
 
 export default function Pricing() {
-  const [plans, setPlans] = useState(FALLBACK);
-
-  useEffect(() => {
-    getPricing()
-      .then(r => { if (r.data?.data?.length) setPlans(r.data.data); })
-      .catch(() => {});
-  }, []);
-
   return (
     <section className="pricing-section" id="pricing">
       <div className="pricing-container">
@@ -28,8 +57,8 @@ export default function Pricing() {
           because we believe in honesty and transparency.
         </p>
         <div className="pricing-grid">
-          {plans.map((plan) => (
-            <div className={`pc ${plan.is_featured ? 'pc-featured' : ''}`} key={plan.name} data-aos="fade-up">
+          {PLANS.map((plan) => (
+            <div className={`pc ${plan.is_featured ? 'pc-featured' : ''}`} key={plan.badge} data-aos="fade-up">
               {!!plan.is_featured && <div className="pc-ribbon">⭐ MOST POPULAR</div>}
               <div className="pc-top">
                 <span className={`pc-badge ${plan.badge_class}`}>✦ {plan.badge}</span>
@@ -40,8 +69,13 @@ export default function Pricing() {
               </div>
               <div className="pc-divider" />
               <ul className="pc-features">
-                {(plan.features || []).map(f => (
-                  <li key={f}><FiCheck className="pc-check" size={14} /> {f}</li>
+                {plan.features.map(f => (
+                  <li key={f.text}>
+                    {f.included
+                      ? <FiCheck className="pc-check" size={14} />
+                      : <FiX className="pc-cross" size={14} />}
+                    {f.text}
+                  </li>
                 ))}
               </ul>
               <Link to={`/payment?package=${plan.badge.toLowerCase()}`} className="pc-btn">Get Started</Link>
