@@ -276,34 +276,25 @@
   margin-bottom: 12px;
   letter-spacing: 0.5px;
 }
-.badge-silver { background: #e8f0ff; color: #4a6fa5; }
-.badge-gold   { background: #fff3e0; color: #c07000; }
-.badge-diamond{ background: #f3e8ff; color: #7c3aed; }
+.badge-silver  { background: #e8f0ff; color: #4a6fa5; }
+.badge-gold    { background: #fff3e0; color: #c07000; }
+.badge-diamond { background: #f3e8ff; color: #7c3aed; }
 
-/* Name / desc */
+/* Top block */
+.pc-top { margin-bottom: 0; }
 .pc-name {
-  font-size: 1.45rem;
+  font-size: 1.35rem;
   font-weight: 800;
   color: var(--text-dark);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
-.pc-desc {
-  font-size: 12.5px;
-  color: var(--text-muted);
-  margin-bottom: 14px;
-  line-height: 1.5;
-}
-
-/* Price */
 .pc-price {
   font-size: 2.6rem;
   font-weight: 900;
   color: var(--orange);
   line-height: 1;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
-
-/* Renewal */
 .pc-renewal {
   display: inline-block;
   background: #e8f8ee;
@@ -312,34 +303,71 @@
   font-weight: 600;
   padding: 5px 12px;
   border-radius: 20px;
-  margin-bottom: 18px;
+  margin-bottom: 10px;
+}
+.pc-desc {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+  line-height: 1.5;
 }
 
 /* Divider */
 .pc-divider {
   height: 1px;
   background: #efefef;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 /* Features */
 .pc-features {
   list-style: none;
   flex: 1;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
 }
 .pc-features li {
   display: flex;
   align-items: center;
-  gap: 9px;
-  font-size: 13px;
+  gap: 8px;
+  font-size: 12.5px;
   color: var(--text-dark);
-  padding: 6px 0;
+  padding: 5px 0;
   border-bottom: 1px solid #f5f5f5;
 }
 .pc-features li:last-child { border-bottom: none; }
 .pc-check { color: var(--green); flex-shrink: 0; }
 .pc-cross { color: #e03030; flex-shrink: 0; }
+
+/* Not-included red box */
+.pc-not-included {
+  background: #fff5f5;
+  border: 1px solid #ffd0d0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+}
+.pc-not-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: #c0392b;
+  font-weight: 600;
+  padding: 3px 0;
+}
+
+/* Diamond green highlight box */
+.pc-highlight {
+  background: #e8f8ee;
+  border: 1px solid #b2dfcc;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--green);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
 
 /* Button */
 .pc-btn {
@@ -362,22 +390,48 @@
   color: #fff;
 }
 
-/* Responsive */
-@media (max-width: 991px) {
-  .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-  .pricing-heading { font-size: 32px; }
+/* Feature badges bar */
+.pricing-badges {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 48px;
+  margin-bottom: 0;
 }
-@media (max-width: 600px) {
-  .pricing-grid { grid-template-columns: 1fr; }
-  .pricing-heading { font-size: 26px; }
-  .pricing-slot-btn { width: 100%; max-width: 340px; }
+.pricing-badge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: #f9fafb;
+  border: 1px solid #e8e8e8;
+  border-radius: 14px;
+  padding: 16px 22px;
+  min-width: 150px;
+  text-align: center;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.pricing-badge-item:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  transform: translateY(-3px);
+}
+.pricing-badge-icon { font-size: 22px; line-height: 1; }
+.pricing-badge-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+.pricing-badge-sub {
+  font-size: 11.5px;
+  color: var(--text-muted);
 }
 
-/* Book Your Slot CTA */
+/* CTA */
 .pricing-cta-wrap {
   display: flex;
   justify-content: center;
-  margin-top: 40px;
+  margin-top: 36px;
   margin-bottom: 80px;
 }
 .pricing-slot-btn {
@@ -400,6 +454,21 @@
   transform: scale(1.03);
   box-shadow: 0 12px 36px rgba(26,122,60,0.38);
   color: #fff;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+  .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+  .pricing-heading { font-size: 32px; }
+  .pricing-badges { gap: 10px; }
+  .pricing-badge-item { min-width: 130px; padding: 14px 16px; }
+}
+@media (max-width: 600px) {
+  .pricing-grid { grid-template-columns: 1fr; }
+  .pricing-heading { font-size: 26px; }
+  .pricing-slot-btn { width: 100%; max-width: 340px; }
+  .pricing-badges { gap: 8px; }
+  .pricing-badge-item { min-width: calc(50% - 8px); padding: 12px 10px; }
 }
 
 /* ===== WHY CHOOSE US ===== */

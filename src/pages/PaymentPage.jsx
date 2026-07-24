@@ -10,40 +10,46 @@ import './PaymentPage.css';
 
 /* ── Package data ── */
 const PACKAGES = {
-  silver: {
-    key: 'silver', badge: 'SILVER', name: 'Silver Package',
-    price: '₹9,999', priceNum: 9999,
-    renewal: 'Renewal After 1 Year Only ₹2500',
+  basic: {
+    key: 'basic', badge: 'BASIC', name: 'Basic Website Package',
+    price: '₹14,999', priceNum: 14999,
+    renewal: 'Renewal After 1 Year Only ₹4999',
     delivery: '3–5 Working Days',
     features: [
-      '1 Year Free Domain','1 Year Free Hosting','Up to 5 Pages',
-      '2 Business Emails','SSL Security','Mobile Friendly Design',
-      'Call / Chat Button','Basic SEO Setup','Basic Speed Optimization',
-      'Basic Support','Delivery Time 3-5 Days','Payment & Shipping Integration',
+      'Static Website','Responsive Design','Up to 5 Pages',
+      '1 Year Free Domain','2 Business Emails','SSL Security',
+      'Mobile Friendly Design','Call / WhatsApp Button','Basic SEO Setup',
+      'Basic Speed Optimization','Contact Form','Google Map',
+      'Social Media Integration','Payment Gateway Integration','Delivery Time 3–5 Days',
     ],
   },
-  golden: {
-    key: 'golden', badge: 'GOLDEN', name: 'Golden Package',
-    price: '₹14,999', priceNum: 14999,
-    renewal: 'Renewal After 1 Year Only ₹2500',
+  dynamic: {
+    key: 'dynamic', badge: 'DYNAMIC', name: 'Dynamic Website Package',
+    price: '₹29,999', priceNum: 29999,
+    renewal: 'Renewal After 1 Year Only ₹4999',
     delivery: '5–7 Working Days',
     features: [
-      '1 Year Free Domain','1 Year Free Hosting','Up to 5 to 10 Pages',
-      '5 Business Emails','SSL Security','Mobile Friendly Design',
-      'Call / Chat Button','Advanced SEO Setup','Advanced Speed Optimization',
-      'Advanced Support','Delivery Time 5-7 Days','Payment & Shipping Integration',
+      'Dynamic Website','Responsive Design','Up to 10 Pages',
+      '1 Year Free Domain','5 Business Emails','Backend Development',
+      'Database Integration','User Login','Contact Management',
+      'CMS Features','Payment Gateway Integration','Advanced SEO Setup',
+      'Advanced Speed Optimization','Premium UI / UX','Delivery Time 5–7 Days',
     ],
   },
   diamond: {
     key: 'diamond', badge: 'DIAMOND', name: 'Diamond Package',
-    price: '₹19,999', priceNum: 19999,
-    renewal: 'Renewal After 1 Year Only ₹2500',
+    price: '₹49,999', priceNum: 49999,
+    renewal: 'Renewal After 1 Year Only ₹4999',
     delivery: '7–10 Working Days',
     features: [
-      '1 Year Free Domain','1 Year Free Hosting','Up to 10 to 15 Pages',
-      'Unlimited Business Emails','SSL Security','Mobile Friendly Design',
-      'Call / Chat Button','Premium SEO Setup','Premium Speed Optimization',
-      'Premium Support','Delivery Time 7-10 Days','Payment & Shipping Integration',
+      'Dynamic Website','Premium UI / UX Design','Unlimited Pages',
+      '1 Year Free Domain','Unlimited Business Emails','Backend Development',
+      'Admin Dashboard','Database Integration','User Management',
+      'Booking Management','Payment Management','Analytics Dashboard',
+      'Blog Management','Gallery Management','SEO Management',
+      'API Integration','WhatsApp Integration','Email Integration',
+      'Security Features','Premium SEO Setup','Premium Speed Optimization',
+      'Lifetime Code Quality','Delivery Time 7–10 Days',
     ],
   },
 };
@@ -79,7 +85,7 @@ const UPI_APPS = [
 const STEPS = [
   { label: 'Package',  icon: '📦' },
   { label: 'Payment',  icon: '💳' },
-  { label: 'Confirm',  icon: '✅' },
+  { label: 'Confirm',  icon: '☑️' },
 ];
 
 const empty = {
@@ -119,8 +125,8 @@ function Field({ label, req, error, icon, children }) {
 export default function PaymentPage() {
   const [searchParams]  = useSearchParams();
   const navigate        = useNavigate();
-  const pkgKey          = searchParams.get('package') || 'silver';
-  const plan            = PACKAGES[pkgKey] || PACKAGES.silver;
+  const pkgKey          = searchParams.get('package') || 'basic';
+  const plan            = PACKAGES[pkgKey] || PACKAGES.basic;
 
   const [form, setForm]         = useState(empty);
   const [errors, setErrors]     = useState({});
